@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Axle OEM · Parts Fulfillment Walkthrough</title>
+<title>Axle OEM · Agentic Parts Fulfillment</title>
+<meta name="description" content="An agent-orchestrated parts request and fulfillment flow between automobile OEM, dealer network, and supplier ecosystem." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f6f5f1;
@@ -29,8 +30,6 @@
     --ok-soft:#dfeee4;
     --warn:#b07028;
     --warn-soft:#f6e6cf;
-    --rose:#b24a4a;
-    --rose-soft:#f3dedd;
     --violet:#6d5aa8;
     --violet-soft:#ebe6f5;
     --teal:#3d7a82;
@@ -40,2035 +39,714 @@
     --sans:'Inter Tight', system-ui, sans-serif;
     --shadow-sm: 0 1px 2px rgba(31,36,48,.04), 0 1px 1px rgba(31,36,48,.03);
     --shadow-md: 0 4px 14px rgba(31,36,48,.06), 0 1px 2px rgba(31,36,48,.04);
-    --shadow-lg: 0 10px 30px rgba(31,36,48,.1), 0 2px 6px rgba(31,36,48,.05);
+    --shadow-lg: 0 14px 40px rgba(31,36,48,.1), 0 2px 8px rgba(31,36,48,.05);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
   body{
-    background:
-      radial-gradient(1200px 600px at 10% -10%, rgba(58,74,107,.05), transparent 60%),
-      radial-gradient(900px 500px at 110% 110%, rgba(200,137,42,.05), transparent 60%),
-      var(--bg);
+    font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--text);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(58,74,107,.06), transparent 60%),
+      radial-gradient(1000px 600px at 110% 20%, rgba(200,137,42,.05), transparent 60%),
+      radial-gradient(900px 500px at -5% 110%, rgba(61,122,130,.04), transparent 60%);
     min-height:100vh;
-    overflow-x:hidden;
   }
 
-  /* ================ TOP BAR ================ */
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px 22px;border-bottom:1px solid var(--line);
-    background:#fdfcf8;position:sticky;top:0;z-index:50;
+  /* ============ NAV ============ */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(246,245,241,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:14px 32px;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
   }
-  .brand{display:flex;align-items:center;gap:14px}
+  .nav-brand{display:flex;align-items:center;gap:12px}
   .brand-mark{
-    width:28px;height:28px;border-radius:6px;background:var(--primary);
-    display:grid;place-items:center;color:#fff;font-family:var(--mono);font-weight:700;font-size:13px;
+    width:30px;height:30px;border-radius:7px;background:var(--primary);
+    display:grid;place-items:center;color:#fff;font-family:var(--mono);font-weight:700;font-size:14px;
     box-shadow:0 0 0 3px rgba(58,74,107,.08);
   }
-  .brand-name{font-family:var(--serif);font-weight:500;font-size:18px;letter-spacing:-.01em;color:var(--text)}
-  .brand-sep{color:var(--text-3);margin:0 2px;font-weight:300}
-  .brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+  .brand-wordmark{font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:-.015em}
+  .brand-sub{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
 
-  .top-right{display:flex;align-items:center;gap:10px}
-  .scenario-select{
-    background:#fff;border:1px solid var(--line-2);border-radius:8px;
-    padding:7px 12px 7px 12px;font-family:var(--sans);font-size:12px;color:var(--text);
-    cursor:pointer;box-shadow:var(--shadow-sm);font-weight:500;
+  .nav-links{display:flex;align-items:center;gap:26px;font-size:13px;font-weight:500}
+  .nav-links a{color:var(--text-2);text-decoration:none;transition:color .15s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{
+    background:var(--primary);color:#fff;padding:9px 16px;border-radius:8px;text-decoration:none;
+    font-size:12.5px;font-weight:600;letter-spacing:.01em;
+    display:inline-flex;align-items:center;gap:6px;transition:background .15s;
+    box-shadow:0 2px 6px rgba(58,74,107,.2);
   }
-  .top-crumb{font-family:var(--mono);font-size:10.5px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-right:8px}
-  .top-crumb b{color:var(--text);font-weight:600}
+  .nav-cta:hover{background:var(--primary-2)}
+  .nav-cta svg{width:11px;height:11px}
 
-  /* ================ PAGE CONTAINERS ================ */
-  .page{display:none}
-  .page.active{display:block}
+  /* ============ LAYOUT ============ */
+  .container{max-width:1180px;margin:0 auto;padding:0 32px}
+  section{padding:80px 0;position:relative}
+  .section-eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin-bottom:14px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .section-eyebrow::before{content:'';width:18px;height:1px;background:var(--accent)}
+  .section-title{
+    font-family:var(--serif);font-weight:500;font-size:40px;line-height:1.1;letter-spacing:-.02em;
+    margin-bottom:16px;max-width:700px;
+  }
+  .section-lead{
+    font-size:16px;color:var(--text-2);line-height:1.6;max-width:680px;margin-bottom:48px;
+  }
 
-  /* ================ PAGE 1: CHAT ================ */
-  .chat-stage{
-    min-height:calc(100vh - 58px);
-    display:flex;align-items:center;justify-content:center;padding:32px 16px;
+  /* ============ HERO ============ */
+  .hero{
+    padding:80px 0 90px;position:relative;overflow:hidden;
   }
-  .chat-wrap{width:100%;max-width:640px}
-  .chat-header{
-    text-align:center;margin-bottom:22px;
+  .hero-grid{
+    display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:center;
   }
-  .chat-header h1{
-    font-family:var(--serif);font-weight:500;font-size:28px;margin:0 0 6px;letter-spacing:-.015em;
+  .hero-eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--text-2);font-weight:600;margin-bottom:24px;
+    padding:6px 14px;background:#fff;border:1px solid var(--line);border-radius:999px;
+    box-shadow:var(--shadow-sm);
   }
-  .chat-header p{
-    font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;margin:0;
+  .hero-eyebrow .live-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(63,138,92,.15)}
+  .hero-title{
+    font-family:var(--serif);font-weight:400;font-size:64px;line-height:1.02;letter-spacing:-.025em;
+    margin-bottom:22px;
   }
-  .chat-step-label{
-    text-align:center;margin-bottom:16px;
-    font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.2em;text-transform:uppercase;
+  .hero-title em{font-style:italic;color:var(--accent);font-weight:500}
+  .hero-lead{
+    font-size:17px;color:var(--text-2);line-height:1.6;margin-bottom:36px;max-width:560px;
   }
-  .chat-step-label span{color:var(--accent);font-weight:600}
+  .hero-lead b{color:var(--text);font-weight:600}
+  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn-primary{
+    background:var(--primary);color:#fff;padding:14px 24px;border-radius:10px;text-decoration:none;
+    font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 4px 12px rgba(58,74,107,.25);transition:all .2s;
+  }
+  .btn-primary:hover{background:var(--primary-2);transform:translateY(-1px);box-shadow:0 6px 16px rgba(58,74,107,.3)}
+  .btn-primary svg{width:13px;height:13px}
+  .btn-secondary{
+    background:#fff;color:var(--text);padding:14px 22px;border-radius:10px;text-decoration:none;
+    font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--line-2);box-shadow:var(--shadow-sm);transition:all .2s;
+  }
+  .btn-secondary:hover{border-color:var(--line-3);transform:translateY(-1px)}
+  .hero-meta{
+    margin-top:28px;display:flex;gap:28px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--text-3);
+  }
+  .hero-meta b{color:var(--text);font-weight:600}
 
-  .slack{
-    background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--line);
-    box-shadow:var(--shadow-md);
+  /* Hero visual — stacked preview cards */
+  .hero-visual{position:relative;height:460px}
+  .preview-card{
+    position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;
+    box-shadow:var(--shadow-lg);padding:18px;
   }
-  .slack-head{
-    padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel-2);
+  .pc-1{
+    top:0;left:0;width:260px;
+    transform:rotate(-3deg);
+    animation:float1 6s ease-in-out infinite;
+  }
+  .pc-2{
+    top:70px;right:0;width:280px;
+    transform:rotate(3deg);
+    animation:float2 7s ease-in-out infinite;
+  }
+  .pc-3{
+    bottom:0;left:40px;width:300px;
+    transform:rotate(-1deg);
+    animation:float3 8s ease-in-out infinite;
+  }
+  @keyframes float1{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(-3deg) translateY(-8px)}}
+  @keyframes float2{0%,100%{transform:rotate(3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-6px)}}
+  @keyframes float3{0%,100%{transform:rotate(-1deg) translateY(0)}50%{transform:rotate(-1deg) translateY(-10px)}}
+
+  .pc-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--text-3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .pc-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .pc-title{font-family:var(--serif);font-size:16px;font-weight:500;letter-spacing:-.01em;margin-bottom:10px}
+  .pc-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .pc-row:last-child{border:none}
+  .pc-row .k{color:var(--text-2)}
+  .pc-row .v{color:var(--text);font-weight:600}
+  .pc-row .v.hi{color:var(--warn)}
+  .pc-badge{
+    display:inline-block;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:9px;
+    letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-top:8px;
+  }
+  .pc-badge.ok{background:var(--ok-soft);color:var(--ok)}
+  .pc-badge.amber{background:var(--accent-soft);color:var(--warn)}
+  .pc-badge.primary{background:var(--primary-soft);color:var(--primary)}
+
+  /* ============ STATS STRIP ============ */
+  .stats{
+    padding:40px 0 30px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(4, 1fr);gap:40px;
+  }
+  .stat-item{border-left:2px solid var(--accent);padding-left:16px}
+  .stat-value{font-family:var(--serif);font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1}
+  .stat-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-top:8px;font-weight:600}
+
+  /* ============ PROBLEM / SOLUTION ============ */
+  .narrative{
+    display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;
+  }
+  .narrative-col h3{
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;color:var(--text-3);margin-bottom:16px;
     display:flex;align-items:center;gap:10px;
   }
-  .slack-hash{color:var(--text-3);font-weight:700;font-size:16px}
-  .slack-ch{color:var(--text);font-weight:700;font-size:14px}
-  .slack-meta{color:var(--text-3);font-size:11px;margin-left:auto;font-family:var(--mono)}
-  .slack-topic{font-size:11px;color:var(--text-3);border-top:1px solid var(--line);padding:6px 18px;background:#fff;font-family:var(--mono);letter-spacing:.02em}
+  .narrative-col h3 .pill{
+    padding:3px 10px;border-radius:4px;font-weight:700;
+  }
+  .narrative-col.problem h3 .pill{background:var(--warn-soft);color:var(--warn)}
+  .narrative-col.solution h3 .pill{background:var(--ok-soft);color:var(--ok)}
+  .narrative-col .lead{
+    font-family:var(--serif);font-size:22px;line-height:1.35;font-weight:400;letter-spacing:-.01em;margin-bottom:20px;
+  }
+  .narrative-col p{color:var(--text-2);line-height:1.7;font-size:14px}
 
-  .slack-body{padding:18px;min-height:320px;background:#fff}
-  .msg{display:flex;gap:12px;margin-bottom:18px;opacity:0;transform:translateY(8px);transition:opacity .4s ease, transform .4s ease}
-  .msg.in{opacity:1;transform:none}
-  .avatar{
-    width:36px;height:36px;border-radius:7px;flex-shrink:0;
-    display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:13px;color:#fff;
+  /* ============ AGENTS ============ */
+  .agents-intro{
+    display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:48px;
   }
-  .av-bot{background:var(--primary)}
-  .av-user{background:var(--accent)}
-  .av-oem{background:var(--teal)}
-  .msg-body{flex:1;min-width:0}
-  .msg-head{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
-  .msg-name{color:var(--text);font-weight:700;font-size:14px}
-  .msg-tag{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;background:var(--primary-soft);color:var(--primary);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
-  .msg-tag.you{background:var(--accent-soft);color:var(--warn)}
-  .msg-tag.oem{background:var(--teal-soft);color:var(--teal)}
-  .msg-time{color:var(--text-3);font-size:10.5px;font-family:var(--mono)}
-  .msg-text{color:var(--text);font-size:13.5px;line-height:1.55}
-  .msg-text b{color:var(--text);font-weight:600}
-  .msg-card{
-    margin-top:10px;border:1px solid var(--line);border-left:3px solid var(--primary);
-    border-radius:6px;padding:14px;background:var(--panel-2);
+  .agents-count{
+    font-family:var(--serif);font-size:180px;line-height:.85;letter-spacing:-.04em;font-weight:300;color:var(--primary);
   }
-  .mc-label{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
-  .mc-title{color:var(--text);font-weight:700;font-size:14px;margin-bottom:10px;font-family:var(--serif)}
-  .mc-table{width:100%;border-collapse:collapse;margin-top:4px}
-  .mc-table tr{border-bottom:1px dashed var(--line)}
-  .mc-table tr:last-child{border:none}
-  .mc-table td{padding:7px 0;font-size:12px;color:var(--text);font-family:var(--mono)}
-  .mc-table td.q{text-align:right;color:var(--text);font-weight:600}
-  .mc-table td.sku{color:var(--text-3);font-size:10.5px}
-  .mc-actions{display:flex;gap:8px;margin-top:14px}
-  .mc-btn{
-    padding:9px 14px;border-radius:6px;border:1px solid var(--line-2);background:#fff;color:var(--text);
-    font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s ease;
-  }
-  .mc-btn:hover{border-color:var(--line-3)}
-  .mc-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);padding:9px 18px}
-  .mc-btn.primary:hover{background:var(--primary-2)}
-  .mc-btn.primary.disabled{opacity:.6;pointer-events:none}
-  .mc-btn svg{width:12px;height:12px;margin-left:4px;vertical-align:-1px}
+  .agents-count-sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin-top:6px}
 
-  .chat-compose{
-    border-top:1px solid var(--line);padding:12px 18px;background:var(--panel-2);
-    display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--text-3);
+  .agents-grid{
+    display:grid;grid-template-columns:repeat(5, 1fr);gap:14px;
   }
-  .chat-compose input{
-    flex:1;background:#fff;border:1px solid var(--line);border-radius:6px;padding:8px 10px;
-    font-family:var(--sans);font-size:12px;color:var(--text);
+  .agent-card{
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 18px;
+    box-shadow:var(--shadow-sm);transition:all .2s;position:relative;overflow:hidden;
   }
+  .agent-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--line-3)}
+  .agent-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);
+  }
+  .agent-num{
+    font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--text-3);font-weight:700;margin-bottom:14px;
+  }
+  .agent-icon{
+    width:36px;height:36px;border-radius:8px;background:var(--accent-soft);color:var(--warn);
+    display:grid;place-items:center;margin-bottom:14px;
+  }
+  .agent-icon svg{width:18px;height:18px}
+  .agent-name{font-family:var(--serif);font-size:17px;font-weight:500;letter-spacing:-.01em;margin-bottom:6px;line-height:1.2}
+  .agent-role{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;font-weight:600}
+  .agent-desc{font-size:12.5px;color:var(--text-2);line-height:1.55}
 
-  /* ================ PAGE 2: ORCHESTRATION ================ */
-  .console{
-    display:grid;
-    grid-template-columns: 1fr 360px;
-    gap:1px;background:var(--line);
-    min-height:calc(100vh - 58px);
+  /* ============ SCENARIOS ============ */
+  .scenarios-section{background:var(--panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .scenarios-grid{
+    display:grid;grid-template-columns:repeat(3, 1fr);gap:20px;
   }
-  .main-col{background:var(--bg);display:flex;flex-direction:column;min-width:0}
+  .scenario-card{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:28px;
+    transition:all .2s;text-decoration:none;color:inherit;display:block;
+    box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+  }
+  .scenario-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary)}
+  .scenario-num{
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--text-3);font-weight:700;margin-bottom:16px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .scenario-num .chip{
+    padding:3px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.08em;
+  }
+  .scenario-num .chip.simple{background:var(--ok-soft);color:var(--ok)}
+  .scenario-num .chip.standard{background:var(--primary-soft);color:var(--primary)}
+  .scenario-num .chip.fast{background:var(--accent-soft);color:var(--warn)}
+  .scenario-title{font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:-.01em;margin-bottom:10px;line-height:1.2}
+  .scenario-desc{font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:18px}
+  .scenario-meta{
+    padding-top:16px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(2, 1fr);gap:12px;font-family:var(--mono);font-size:10.5px;
+  }
+  .scenario-meta .sm-row{display:flex;flex-direction:column;gap:2px}
+  .scenario-meta .sm-k{color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;font-size:9px;font-weight:600}
+  .scenario-meta .sm-v{color:var(--text);font-weight:600}
+  .scenario-link{
+    margin-top:18px;display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;font-weight:600;color:var(--primary);
+  }
+  .scenario-link svg{width:12px;height:12px;transition:transform .2s}
+  .scenario-card:hover .scenario-link svg{transform:translateX(3px)}
 
-  /* Step header */
-  .step-header{
-    padding:16px 22px;background:#fdfcf8;border-bottom:1px solid var(--line);
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  /* ============ CAPABILITIES ============ */
+  .cap-grid{
+    display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;
   }
-  .step-crumbs{
-    display:flex;align-items:center;gap:8px;flex:1;overflow-x:auto;
+  .cap-item{
+    padding:24px;
   }
-  .step-crumb{
-    display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--text-3);
-    border:1px solid transparent;white-space:nowrap;flex-shrink:0;
+  .cap-item h4{
+    font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:-.01em;margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
   }
-  .step-crumb .step-num{
-    width:18px;height:18px;border-radius:50%;background:var(--bg-2);color:var(--text-3);
-    display:grid;place-items:center;font-size:10px;font-weight:700;border:1px solid var(--line);
+  .cap-item h4 .num{
+    font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.04em;
   }
-  .step-crumb.done{color:var(--ok)}
-  .step-crumb.done .step-num{background:var(--ok-soft);border-color:#b9d6c4;color:var(--ok)}
-  .step-crumb.current{color:var(--accent);background:var(--accent-soft);border-color:#e0cfae}
-  .step-crumb.current .step-num{background:var(--accent);border-color:var(--accent);color:#fff}
+  .cap-item p{font-size:13.5px;color:var(--text-2);line-height:1.65}
 
-  .step-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-  .btn{
-    padding:9px 14px;border-radius:8px;font-family:var(--sans);font-size:12px;font-weight:600;
-    cursor:pointer;border:1px solid var(--line-2);background:#fff;color:var(--text);
-    display:inline-flex;align-items:center;gap:6px;transition:all .15s ease;
-    box-shadow:var(--shadow-sm);
+  /* ============ SYSTEM ARCHITECTURE STRIP ============ */
+  .arch{padding:60px 0;border-top:1px solid var(--line)}
+  .arch-title{
+    text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--text-3);font-weight:600;margin-bottom:28px;
   }
-  .btn:hover:not(:disabled){border-color:var(--line-3)}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 2px 6px rgba(58,74,107,.2)}
-  .btn.primary:hover:not(:disabled){background:var(--primary-2)}
-  .btn.accent{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(200,137,42,.25)}
-  .btn.accent:hover:not(:disabled){background:var(--accent-2)}
-  .btn svg{width:12px;height:12px}
+  .arch-systems{
+    display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .arch-sys{
+    padding:10px 18px;background:#fff;border:1px solid var(--line);border-radius:8px;
+    font-family:var(--mono);font-size:12px;color:var(--text);font-weight:500;
+    box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:8px;
+  }
+  .arch-sys .dot{width:6px;height:6px;border-radius:50%}
+  .arch-sys.sys .dot{background:var(--teal)}
+  .arch-sys.ag  .dot{background:var(--accent)}
+  .arch-sys.hu  .dot{background:var(--violet)}
+  .arch-sep{color:var(--text-3);font-family:var(--mono);font-size:14px}
 
-  /* Work canvas */
-  .work-area{
-    display:grid;grid-template-columns:360px 1fr;gap:1px;background:var(--line);
-    flex:1;min-height:0;
+  /* ============ CTA FOOTER ============ */
+  .cta-section{
+    background:var(--primary);color:#fff;
+    padding:90px 32px;text-align:center;position:relative;overflow:hidden;
   }
-  .graph-col{background:#fbfaf6;padding:20px;overflow-y:auto}
-  .graph-title{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:14px}
-  .graph-legend{display:flex;gap:10px;margin-bottom:14px;font-family:var(--mono);font-size:9.5px;color:var(--text-2);letter-spacing:.04em}
-  .graph-legend .lg-item{display:flex;align-items:center;gap:5px}
-  .graph-legend .lg-dot{width:8px;height:8px;border-radius:2px;border:1px solid}
-  .lg-sys{background:var(--teal-soft);border-color:#b9cfd1}
-  .lg-ag{background:#f1ecdf;border-color:#e0cfae}
-  .lg-hu{background:var(--violet-soft);border-color:#cec3e5}
+  .cta-section::before{
+    content:'';position:absolute;inset:0;
+    background-image:
+      radial-gradient(600px 300px at 20% 20%, rgba(200,137,42,.15), transparent 60%),
+      radial-gradient(500px 250px at 80% 80%, rgba(255,255,255,.06), transparent 60%);
+    pointer-events:none;
+  }
+  .cta-eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--accent-soft);font-weight:600;margin-bottom:16px;
+  }
+  .cta-title{
+    font-family:var(--serif);font-size:48px;font-weight:400;letter-spacing:-.02em;line-height:1.1;margin-bottom:18px;
+    max-width:720px;margin-left:auto;margin-right:auto;
+  }
+  .cta-title em{font-style:italic;color:var(--accent-soft);font-weight:500}
+  .cta-lead{font-size:16px;color:rgba(255,255,255,.75);max-width:580px;margin:0 auto 32px;line-height:1.6}
+  .cta-ctas{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;position:relative;z-index:1}
+  .cta-primary{
+    background:var(--accent);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;
+    font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 4px 16px rgba(200,137,42,.3);transition:all .2s;
+  }
+  .cta-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
+  .cta-primary svg{width:13px;height:13px}
+  .cta-ghost{
+    background:transparent;color:#fff;padding:14px 22px;border-radius:10px;text-decoration:none;
+    font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.25);
+    display:inline-flex;align-items:center;gap:8px;transition:all .2s;
+  }
+  .cta-ghost:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05)}
 
-  .graph-node{
-    display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line-2);border-radius:8px;
-    background:#fff;margin-bottom:8px;transition:all .3s ease;box-shadow:var(--shadow-sm);
-    position:relative;
+  /* ============ FOOTER ============ */
+  footer{
+    padding:36px 32px;border-top:1px solid var(--line);background:var(--bg);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+    font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.04em;
   }
-  .graph-node.agent{background:linear-gradient(180deg,#fff,#f1ecdf)}
-  .graph-node.agent .gn-icon{background:var(--accent-soft);color:var(--warn);border-color:#e0cfae}
-  .graph-node.system{background:linear-gradient(180deg,#fff,var(--teal-soft))}
-  .graph-node.system .gn-icon{background:var(--teal-soft);color:var(--teal);border-color:#b9cfd1}
-  .graph-node.human{background:linear-gradient(180deg,#fff,var(--violet-soft))}
-  .graph-node.human .gn-icon{background:var(--violet-soft);color:var(--violet);border-color:#cec3e5}
-  .graph-node.skipped{opacity:.35}
-  .graph-node.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,137,42,.12), var(--shadow-md)}
-  .graph-node.done{border-color:#b9d6c4}
+  footer b{color:var(--text-2);font-weight:600}
 
-  .gn-icon{
-    width:26px;height:26px;border-radius:5px;display:grid;place-items:center;
-    font-family:var(--mono);font-weight:700;font-size:10px;border:1px solid var(--line-2);flex-shrink:0;
-  }
-  .gn-body{flex:1;min-width:0}
-  .gn-type{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;font-weight:600}
-  .gn-name{font-family:var(--serif);font-size:13.5px;font-weight:500;color:var(--text);letter-spacing:-.005em;line-height:1.2;margin-top:1px}
-  .gn-sub{font-family:var(--mono);font-size:10px;color:var(--text-2);margin-top:3px;letter-spacing:.02em}
-  .gn-status{
-    width:7px;height:7px;border-radius:50%;background:var(--line-3);position:absolute;top:10px;right:10px;
-  }
-  .graph-node.active .gn-status{background:var(--accent);box-shadow:0 0 0 3px rgba(200,137,42,.2);animation:pulse 1.2s ease-in-out infinite}
-  .graph-node.done .gn-status{background:var(--ok);box-shadow:0 0 0 3px rgba(63,138,92,.15)}
-  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
-
-  .connector{
-    height:10px;width:2px;background:var(--line-2);margin:0 auto 8px;margin-left:25px;
-  }
-  .connector.done{background:#8fb9a3}
-
-  /* Work panel (center of page 2) */
-  .work-col{background:#fbfaf6;overflow-y:auto;padding:28px 32px}
-  .work-phase-tag{
-    display:inline-block;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--warn);
-    font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:12px;
-  }
-  .work-title{font-family:var(--serif);font-size:26px;font-weight:500;letter-spacing:-.015em;margin:0 0 8px;line-height:1.2}
-  .work-desc{font-size:14px;color:var(--text-2);margin-bottom:22px;line-height:1.55;max-width:600px}
-
-  .work-card{
-    background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px;
-    box-shadow:var(--shadow-sm);
-  }
-  .wc-label{
-    font-family:var(--mono);font-size:9.5px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:10px;
-    display:flex;align-items:center;gap:8px;
-  }
-  .wc-label .wc-dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-  .wc-row{
-    display:grid;grid-template-columns:160px 1fr;gap:14px;padding:7px 0;border-bottom:1px dashed var(--line);
-    font-size:13px;
-  }
-  .wc-row:last-child{border:none}
-  .wc-row .k{color:var(--text-2);font-family:var(--mono);font-size:11.5px}
-  .wc-row .v{color:var(--text);font-weight:500;font-family:var(--mono);font-size:11.5px}
-  .wc-row .v.hi{color:var(--warn);font-weight:600}
-  .wc-row .v.ok{color:var(--ok);font-weight:600}
-  .wc-row .v.warn{color:var(--rose);font-weight:600}
-
-  .wc-decision{
-    margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--accent-soft);border:1px solid #e0cfae;
-    display:flex;gap:10px;align-items:flex-start;
-  }
-  .wc-decision .dec-icon{
-    width:24px;height:24px;border-radius:6px;background:var(--accent);color:#fff;
-    display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:12px;flex-shrink:0;
-  }
-  .wc-decision .dec-body{flex:1}
-  .wc-decision .dec-title{font-weight:700;font-size:12.5px;color:var(--text);margin-bottom:3px}
-  .wc-decision .dec-text{font-size:12.5px;color:var(--text-2);line-height:1.5}
-
-  .wc-table{width:100%;border-collapse:collapse;font-size:12px}
-  .wc-table th{
-    text-align:left;padding:8px 10px;background:var(--panel-2);border-bottom:1px solid var(--line);
-    font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:600;
-  }
-  .wc-table td{padding:8px 10px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--text)}
-  .wc-table tr:last-child td{border:none}
-  .wc-table td.q,.wc-table th.q{text-align:right}
-  .wc-table td.status-ok{color:var(--ok);font-weight:600}
-  .wc-table td.status-short{color:var(--rose);font-weight:600}
-
-  /* Right: activity + records */
-  .side-col{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
-  .side-tabs{
-    display:flex;border-bottom:1px solid var(--line);background:#fdfcf8;
-  }
-  .side-tab{
-    flex:1;padding:12px;background:none;border:none;cursor:pointer;
-    font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);font-weight:600;
-    border-bottom:2px solid transparent;
-  }
-  .side-tab.active{color:var(--primary);border-bottom-color:var(--primary);background:#fff}
-
-  .side-body{flex:1;overflow-y:auto;padding:16px 18px}
-  .side-panel{display:none}
-  .side-panel.active{display:block}
-
-  /* Activity list */
-  .activity-item{
-    display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);
-    animation:slideIn .3s ease;
-  }
-  .activity-item:last-child{border:none}
-  @keyframes slideIn{from{opacity:0;transform:translateX(4px)}to{opacity:1;transform:none}}
-  .ai-time{font-family:var(--mono);font-size:10px;color:var(--text-3);min-width:48px;padding-top:2px}
-  .ai-body{flex:1;min-width:0}
-  .ai-actor{
-    display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
-    padding:1px 7px;border-radius:3px;margin-bottom:4px;
-  }
-  .ai-actor.agent{background:var(--accent-soft);color:var(--warn)}
-  .ai-actor.system{background:var(--teal-soft);color:var(--teal)}
-  .ai-actor.human{background:var(--violet-soft);color:var(--violet)}
-  .ai-text{font-size:12px;color:var(--text);line-height:1.45}
-  .ai-text b{font-weight:600}
-
-  /* Records list */
-  .rec-item{
-    padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:#fff;
-    transition:all .15s ease;box-shadow:var(--shadow-sm);
-    opacity:.4;pointer-events:none;
-  }
-  .rec-item.unlocked{opacity:1;pointer-events:auto;cursor:pointer}
-  .rec-item.unlocked:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
-  .rec-type{font-family:var(--mono);font-size:9.5px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
-  .rec-id{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:600;margin-top:2px}
-  .rec-sub{font-family:var(--mono);font-size:10.5px;color:var(--text-2);margin-top:4px}
-  .rec-link{
-    display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-family:var(--sans);font-size:11px;color:var(--primary);font-weight:600;
-  }
-  .rec-link svg{width:11px;height:11px}
-  .rec-lock{
-    display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.04em;
-  }
-
-  /* ================ RECORD MODAL (system of record view) ================ */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(31,36,48,.4);backdrop-filter:blur(4px);
-    z-index:100;display:none;align-items:flex-start;justify-content:center;
-    padding:40px 16px;overflow-y:auto;
-  }
-  .modal-overlay.open{display:flex}
-  .modal{
-    background:#fff;border-radius:12px;width:100%;max-width:780px;
-    border:1px solid var(--line);box-shadow:var(--shadow-lg);
-    overflow:hidden;animation:modalIn .25s ease;
-  }
-  @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-  .mod-appbar{
-    padding:10px 18px;background:var(--primary);color:#fff;
-    display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
-  }
-  .mod-appbar b{font-weight:700;letter-spacing:.04em;text-transform:none;font-family:var(--serif);font-size:14px;font-style:italic}
-  .mod-appbar .ab-sep{opacity:.5}
-  .mod-appbar .ab-close{
-    margin-left:auto;background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 10px;border-radius:5px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  }
-  .mod-appbar .ab-close:hover{background:rgba(255,255,255,.25)}
-
-  .mod-header{
-    padding:18px 24px;border-bottom:1px solid var(--line);background:var(--panel-2);
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
-  }
-  .mod-breadcrumb{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-  .mod-title{font-family:var(--serif);font-size:22px;font-weight:500;margin:0;letter-spacing:-.01em}
-  .mod-status{
-    padding:4px 10px;border-radius:999px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-  }
-  .mod-status.submitted{background:var(--primary-soft);color:var(--primary)}
-  .mod-status.pending{background:var(--warn-soft);color:var(--warn)}
-  .mod-status.processing{background:var(--accent-soft);color:var(--warn)}
-  .mod-status.shipped{background:var(--teal-soft);color:var(--teal)}
-  .mod-status.complete{background:var(--ok-soft);color:var(--ok)}
-  .mod-status.posted{background:var(--ok-soft);color:var(--ok)}
-  .mod-status.matched{background:var(--ok-soft);color:var(--ok)}
-  .mod-status.open{background:var(--primary-soft);color:var(--primary)}
-  .mod-status.accepted{background:var(--teal-soft);color:var(--teal)}
-  .mod-status.intransit{background:var(--accent-soft);color:var(--warn)}
-
-  .mod-tabs{
-    display:flex;border-bottom:1px solid var(--line);background:#fff;padding:0 16px;
-  }
-  .mod-tab{
-    padding:10px 14px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text-3);
-    border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;
-  }
-  .mod-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-  .mod-body{padding:22px 24px;max-height:60vh;overflow-y:auto;background:#fff}
-
-  .mod-section{margin-bottom:20px}
-  .mod-section-title{
-    font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:700;
-    padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid var(--line);
-  }
-  .mod-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:12px 24px}
-  .mod-field{display:flex;flex-direction:column;gap:3px}
-  .mod-field .mf-k{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.04em;text-transform:uppercase}
-  .mod-field .mf-v{font-size:13px;color:var(--text);font-weight:500;font-family:var(--mono)}
-  .mod-field .mf-v.amt{font-family:var(--serif);font-size:16px;font-weight:500}
-  .mod-field .mf-v.big{font-family:var(--serif);font-size:16px;font-weight:500}
-
-  .mod-table{width:100%;border-collapse:collapse;font-size:12px}
-  .mod-table th{
-    text-align:left;padding:8px 10px;background:var(--panel-2);border:1px solid var(--line);
-    font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600;
-  }
-  .mod-table td{padding:9px 10px;border:1px solid var(--line);font-family:var(--mono);font-size:11.5px;color:var(--text)}
-  .mod-table td.q,.mod-table th.q{text-align:right}
-  .mod-totals-row td{font-weight:700;background:var(--panel-2)}
-
-  .mod-audit{font-family:var(--mono);font-size:11px;color:var(--text-2);line-height:1.6}
-  .mod-audit .aud-line{padding:4px 0;border-bottom:1px dashed var(--line);display:flex;gap:10px}
-  .mod-audit .aud-line:last-child{border:none}
-  .mod-audit .aud-time{color:var(--text-3);min-width:110px}
-  .mod-audit .aud-who{color:var(--primary);font-weight:600;min-width:120px}
-  .mod-audit .aud-act{color:var(--text)}
-
-  ::-webkit-scrollbar{width:8px;height:8px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:#d8d3c5;border-radius:4px}
-  ::-webkit-scrollbar-thumb:hover{background:var(--line-3)}
-
-  @media (max-width:1100px){
-    .console{grid-template-columns:1fr}
-    .work-area{grid-template-columns:1fr}
-    .graph-col{max-height:none}
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:960px){
+    .hero-grid,.narrative,.agents-intro{grid-template-columns:1fr;gap:40px}
+    .hero-title{font-size:44px}
+    .section-title{font-size:30px}
+    .stats-grid{grid-template-columns:repeat(2, 1fr)}
+    .agents-grid{grid-template-columns:repeat(2, 1fr)}
+    .scenarios-grid{grid-template-columns:1fr}
+    .cap-grid{grid-template-columns:1fr}
+    .hero-visual{display:none}
+    .agents-count{font-size:120px}
+    .cta-title{font-size:34px}
+    .nav-links a{display:none}
+    .nav-links .nav-cta{display:inline-flex}
   }
 </style>
 </head>
 <body>
 
-<!-- ================ TOP BAR ================ -->
-<div class="topbar">
-  <div class="brand">
+<!-- ============ NAV ============ -->
+<nav class="nav">
+  <div class="nav-brand">
     <div class="brand-mark">A</div>
     <div>
-      <div class="brand-name">Axle<span class="brand-sep"> · </span><span style="font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--text-2);font-weight:500">OEM Parts Walkthrough</span></div>
-      <div class="brand-sub" id="brandSub">Scenario walkthrough · step by step</div>
+      <div class="brand-wordmark">Axle</div>
+      <div class="brand-sub">Agentic Automotive Platform</div>
     </div>
   </div>
-  <div class="top-right">
-    <span class="top-crumb" id="pageCrumb">STEP <b>1</b> · DEALER INITIATION</span>
-    <select class="scenario-select" id="scenarioSelect">
-      <option value="instock">01 · In-stock at OEM warehouse</option>
-      <option value="oos-oem">02 · Out-of-stock · PO ship to OEM</option>
-      <option value="oos-drop">03 · Out-of-stock · drop-ship to dealer</option>
-    </select>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#agents">Agents</a>
+    <a href="#scenarios">Scenarios</a>
+    <a href="#architecture">Architecture</a>
+    <a class="nav-cta" href="axle-oem-parts-walkthrough.html">
+      Launch demo
+      <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
   </div>
-</div>
+</nav>
 
-<!-- ================ PAGE 1: CHAT ================ -->
-<div class="page active" id="page-chat">
-  <div class="chat-stage">
-    <div class="chat-wrap">
-      <div class="chat-header">
-        <h1>Dealer initiates the parts request</h1>
-        <p>Step 1 of 2 · Slack conversation</p>
-      </div>
-      <div class="chat-step-label">Workspace · <span>Dealer DL-4421 · Mumbai East</span></div>
-
-      <div class="slack">
-        <div class="slack-head">
-          <span class="slack-hash">#</span>
-          <span class="slack-ch">spares-desk</span>
-          <span class="slack-meta">Ravi Mehta · Spares Mgr</span>
-        </div>
-        <div class="slack-topic">Channel for reorder alerts, parts requests, and delivery confirmations</div>
-        <div class="slack-body" id="chatBody">
-          <!-- messages injected -->
-        </div>
-        <div class="chat-compose">
-          <input type="text" disabled placeholder="Message #spares-desk" />
-          <span>⏎</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================ PAGE 2: ORCHESTRATION ================ -->
-<div class="page" id="page-console">
-  <div class="console">
-    <div class="main-col">
-      <div class="step-header">
-        <div class="step-crumbs" id="stepCrumbs"></div>
-        <div class="step-actions">
-          <button class="btn" id="backToChat">
-            <svg viewBox="0 0 12 12" fill="none"><path d="M7 2L3 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Back to chat
-          </button>
-          <button class="btn" id="prevBtn" disabled>Previous</button>
-          <button class="btn accent" id="nextBtn">
-            Next
-            <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="work-area">
-        <div class="graph-col">
-          <div class="graph-title">Flow · agents &amp; systems</div>
-          <div class="graph-legend">
-            <div class="lg-item"><span class="lg-dot lg-ag"></span>Agent</div>
-            <div class="lg-item"><span class="lg-dot lg-sys"></span>System</div>
-            <div class="lg-item"><span class="lg-dot lg-hu"></span>Human</div>
-          </div>
-          <div id="graphList"></div>
-        </div>
-
-        <div class="work-col" id="workCol">
-          <!-- current step detail injected -->
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Activity + Records -->
-    <div class="side-col">
-      <div class="side-tabs">
-        <button class="side-tab active" data-sidetab="activity">Activity</button>
-        <button class="side-tab" data-sidetab="records">Records</button>
-      </div>
-      <div class="side-body">
-        <div class="side-panel active" id="sp-activity">
-          <div id="activityList" style="display:flex;flex-direction:column"></div>
-        </div>
-        <div class="side-panel" id="sp-records">
-          <div style="font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:10px">
-            System of record · click to open
-          </div>
-          <div id="recordsList"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================ RECORD MODAL ================ -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modalContent">
-    <!-- injected -->
-  </div>
-</div>
-
-<script>
-/* ==================== STATE ==================== */
-const state = {
-  scenario:'instock',
-  stepIndex:0,
-  activity:[],
-  records:{}, // { recordKey: {unlocked:true} }
-};
-
-/* ==================== RECORD TEMPLATES ==================== */
-/* Every record defines: type, id, status, modal renderer */
-function now(offset=0){
-  const d = new Date(Date.now() + offset*1000);
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
-}
-
-const RECORD_DEFS = {
-  'PR-2046':{
-    type:'Parts Request',
-    app:'Dealer Management Portal',
-    appSub:'Order Management',
-    id:'PR-2046',
-    status:'submitted',
-    statusLabel:'Submitted',
-    dealer:'DL-4421 · Mumbai East',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Request header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Request #</span><span class="mf-v big">PR-2046</span></div>
-          <div class="mod-field"><span class="mf-k">Created on</span><span class="mf-v">22-Apr-2026 · 09:24 IST</span></div>
-          <div class="mod-field"><span class="mf-k">Dealer</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Requested by</span><span class="mf-v">Ravi Mehta · Spares Mgr</span></div>
-          <div class="mod-field"><span class="mf-k">OEM entity</span><span class="mf-v">Axle OEM India Pvt Ltd</span></div>
-          <div class="mod-field"><span class="mf-k">Price list</span><span class="mf-v">PL-DLR-2026Q2</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>#</th><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Unit price</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹6,800</td><td class="q">₹2,72,000</td></tr>
-            <tr><td>2</td><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td><td class="q">₹420</td><td class="q">₹25,200</td></tr>
-            <tr><td>3</td><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td><td class="q">₹1,312</td><td class="q">₹1,31,200</td></tr>
-            <tr class="mod-totals-row"><td colspan="5" class="q">Total</td><td class="q">₹4,28,400</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Audit</div>
-        <div class="mod-audit">
-          <div class="aud-line"><span class="aud-time">09:23:58 IST</span><span class="aud-who">Reorder Sentinel</span><span class="aud-act">Drafted request from reorder thresholds</span></div>
-          <div class="aud-line"><span class="aud-time">09:24:12 IST</span><span class="aud-who">Ravi Mehta</span><span class="aud-act">Tapped "Order parts" · submitted to OEM</span></div>
-        </div>
-      </div>
-    `
-  },
-  'SL-9821':{
-    type:'Shipment Line',
-    app:'Warehouse Management',
-    appSub:'Outbound',
-    id:'SL-9821',
-    status:'pending',
-    statusLabel:'Pending pick',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Shipment line</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Line #</span><span class="mf-v big">SL-9821</span></div>
-          <div class="mod-field"><span class="mf-k">Source request</span><span class="mf-v">PR-2046</span></div>
-          <div class="mod-field"><span class="mf-k">Warehouse</span><span class="mf-v">WH-MUM (Mumbai)</span></div>
-          <div class="mod-field"><span class="mf-k">Ship-to</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Priority</span><span class="mf-v">Standard</span></div>
-          <div class="mod-field"><span class="mf-k">Carrier</span><span class="mf-v">Blue Dart</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Pick list</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Bin</th><th class="q">Qty</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>A12-03</td><td class="q">40</td><td>Ready</td></tr>
-            <tr><td>OF-18</td><td>B04-11</td><td class="q">60</td><td>Ready</td></tr>
-            <tr><td>SP-V8</td><td>C19-07</td><td class="q">100</td><td>Ready</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'SH-9821':{
-    type:'Shipment',
-    app:'Warehouse Management',
-    appSub:'Dispatch',
-    id:'SH-9821',
-    status:'intransit',
-    statusLabel:'In transit',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Shipment header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Shipment #</span><span class="mf-v big">SH-9821</span></div>
-          <div class="mod-field"><span class="mf-k">AWB / Tracking</span><span class="mf-v">774-2091-6</span></div>
-          <div class="mod-field"><span class="mf-k">From</span><span class="mf-v">Axle WH-MUM</span></div>
-          <div class="mod-field"><span class="mf-k">To</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Dispatched</span><span class="mf-v">22-Apr-2026 · 11:08 IST</span></div>
-          <div class="mod-field"><span class="mf-k">ETA</span><span class="mf-v">22-Apr-2026 · 17:30 IST</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Contents</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td></tr>
-            <tr><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'INV-DLR-8812':{
-    type:'Dealer Invoice',
-    app:'OEM Financials',
-    appSub:'Accounts Receivable',
-    id:'INV-DLR-8812',
-    status:'posted',
-    statusLabel:'Posted',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Invoice header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Invoice #</span><span class="mf-v big">INV-DLR-8812</span></div>
-          <div class="mod-field"><span class="mf-k">Invoice date</span><span class="mf-v">22-Apr-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Bill-to</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Reference</span><span class="mf-v">PR-2046 · SH-9821</span></div>
-          <div class="mod-field"><span class="mf-k">Price list</span><span class="mf-v">PL-DLR-2026Q2</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 30</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹6,800</td><td class="q">₹2,72,000</td></tr>
-            <tr><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td><td class="q">₹420</td><td class="q">₹25,200</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td><td class="q">₹1,312</td><td class="q">₹1,31,200</td></tr>
-            <tr><td colspan="4" class="q">Subtotal</td><td class="q">₹4,28,400</td></tr>
-            <tr><td colspan="4" class="q">GST @ 18%</td><td class="q">₹77,112</td></tr>
-            <tr class="mod-totals-row"><td colspan="4" class="q">Total payable</td><td class="q">₹5,05,512</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Posting</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">AR account</span><span class="mf-v">1210 · Trade Receivables</span></div>
-          <div class="mod-field"><span class="mf-k">Due date</span><span class="mf-v">22-May-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Posted by</span><span class="mf-v">Invoice + AR Agent</span></div>
-          <div class="mod-field"><span class="mf-k">GL journal</span><span class="mf-v">JE-2026-04-7712</span></div>
-        </div>
-      </div>
-    `
-  },
-  'PO-3314':{
-    type:'Purchase Order',
-    app:'Procurement',
-    appSub:'Purchase Orders',
-    id:'PO-3314',
-    status:'open',
-    statusLabel:'Open',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">PO header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">PO #</span><span class="mf-v big">PO-3314</span></div>
-          <div class="mod-field"><span class="mf-k">Issued</span><span class="mf-v">22-Apr-2026 · 09:41 IST</span></div>
-          <div class="mod-field"><span class="mf-k">Supplier</span><span class="mf-v">MotoParts Global (SUP-118)</span></div>
-          <div class="mod-field"><span class="mf-k">Contract</span><span class="mf-v">SC-2024-MPG-007</span></div>
-          <div class="mod-field"><span class="mf-k">Ship-to</span><span class="mf-v">Axle WH-MUM</span></div>
-          <div class="mod-field"><span class="mf-k">Linked request</span><span class="mf-v">PR-2046</span></div>
-          <div class="mod-field"><span class="mf-k">Incoterms</span><span class="mf-v">DAP WH-MUM</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 45</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items · priced from contract</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Contract rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹4,550</td><td class="q">₹1,82,000</td></tr>
-            <tr class="mod-totals-row"><td colspan="4" class="q">Total</td><td class="q">₹1,82,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'PO-3315':{
-    type:'Purchase Order',
-    app:'Procurement',
-    appSub:'Purchase Orders',
-    id:'PO-3315',
-    status:'open',
-    statusLabel:'Open · Drop-ship',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">PO header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">PO #</span><span class="mf-v big">PO-3315</span></div>
-          <div class="mod-field"><span class="mf-k">Issued</span><span class="mf-v">22-Apr-2026 · 09:41 IST</span></div>
-          <div class="mod-field"><span class="mf-k">Supplier</span><span class="mf-v">MotoParts Global (SUP-118)</span></div>
-          <div class="mod-field"><span class="mf-k">Contract</span><span class="mf-v">SC-2024-MPG-007 · drop-ship clause</span></div>
-          <div class="mod-field"><span class="mf-k">Ship-to</span><span class="mf-v">Dealer DL-4421 · Mumbai East (drop-ship)</span></div>
-          <div class="mod-field"><span class="mf-k">Linked request</span><span class="mf-v">PR-2046</span></div>
-          <div class="mod-field"><span class="mf-k">Incoterms</span><span class="mf-v">DAP Dealer</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 45</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items · priced from contract</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Contract rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹4,550</td><td class="q">₹1,82,000</td></tr>
-            <tr class="mod-totals-row"><td colspan="4" class="q">Total</td><td class="q">₹1,82,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'SH-9844':{
-    type:'Shipment',
-    app:'Warehouse Management',
-    appSub:'Consolidated Dispatch',
-    id:'SH-9844',
-    status:'intransit',
-    statusLabel:'In transit',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Consolidated shipment</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Shipment #</span><span class="mf-v big">SH-9844</span></div>
-          <div class="mod-field"><span class="mf-k">AWB / Tracking</span><span class="mf-v">774-3318-9</span></div>
-          <div class="mod-field"><span class="mf-k">From</span><span class="mf-v">Axle WH-MUM</span></div>
-          <div class="mod-field"><span class="mf-k">To</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">GRN received</span><span class="mf-v">From supplier MPG · 40 × BP-220</span></div>
-          <div class="mod-field"><span class="mf-k">Dispatched</span><span class="mf-v">23-Apr-2026 · 10:15 IST</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Contents (consolidated)</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th>Source</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td>Supplier GRN</td></tr>
-            <tr><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td><td>On-hand WH-MUM</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td><td>On-hand WH-MUM</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'SH-9901':{
-    type:'Shipment',
-    app:'Supplier (drop-ship)',
-    appSub:'Dispatch',
-    id:'SH-9901',
-    status:'intransit',
-    statusLabel:'In transit · drop-ship',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Drop-ship shipment</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Shipment #</span><span class="mf-v big">SH-9901</span></div>
-          <div class="mod-field"><span class="mf-k">AWB / Tracking</span><span class="mf-v">881-3094-2</span></div>
-          <div class="mod-field"><span class="mf-k">From</span><span class="mf-v">MotoParts Global · Pune hub</span></div>
-          <div class="mod-field"><span class="mf-k">To</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">On behalf of</span><span class="mf-v">Axle OEM · PO-3315</span></div>
-          <div class="mod-field"><span class="mf-k">Dispatched</span><span class="mf-v">22-Apr-2026 · 14:20 IST</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Contents</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'INV-DLR-8819':{
-    type:'Dealer Invoice',
-    app:'OEM Financials',
-    appSub:'Accounts Receivable',
-    id:'INV-DLR-8819',
-    status:'posted',
-    statusLabel:'Posted',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Invoice header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Invoice #</span><span class="mf-v big">INV-DLR-8819</span></div>
-          <div class="mod-field"><span class="mf-k">Invoice date</span><span class="mf-v">23-Apr-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Bill-to</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Reference</span><span class="mf-v">PR-2046 · SH-9844</span></div>
-          <div class="mod-field"><span class="mf-k">Price list</span><span class="mf-v">PL-DLR-2026Q2</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 30</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹6,800</td><td class="q">₹2,72,000</td></tr>
-            <tr><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td><td class="q">₹420</td><td class="q">₹25,200</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td><td class="q">₹1,312</td><td class="q">₹1,31,200</td></tr>
-            <tr><td colspan="4" class="q">Subtotal</td><td class="q">₹4,28,400</td></tr>
-            <tr><td colspan="4" class="q">GST @ 18%</td><td class="q">₹77,112</td></tr>
-            <tr class="mod-totals-row"><td colspan="4" class="q">Total payable</td><td class="q">₹5,05,512</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Posting</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">AR account</span><span class="mf-v">1210 · Trade Receivables</span></div>
-          <div class="mod-field"><span class="mf-k">Posted by</span><span class="mf-v">Invoice + AR Agent</span></div>
-          <div class="mod-field"><span class="mf-k">GL journal</span><span class="mf-v">JE-2026-04-7719</span></div>
-        </div>
-      </div>
-    `
-  },
-  'INV-DLR-8825':{
-    type:'Dealer Invoice',
-    app:'OEM Financials',
-    appSub:'Accounts Receivable',
-    id:'INV-DLR-8825',
-    status:'posted',
-    statusLabel:'Posted',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Invoice header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Invoice #</span><span class="mf-v big">INV-DLR-8825</span></div>
-          <div class="mod-field"><span class="mf-k">Invoice date</span><span class="mf-v">22-Apr-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Bill-to</span><span class="mf-v">DL-4421 · Mumbai East</span></div>
-          <div class="mod-field"><span class="mf-k">Reference</span><span class="mf-v">PR-2046 · SH-9901 (drop-ship)</span></div>
-          <div class="mod-field"><span class="mf-k">Price list</span><span class="mf-v">PL-DLR-2026Q2</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 30</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set (front)</td><td class="q">40</td><td class="q">₹6,800</td><td class="q">₹2,72,000</td></tr>
-            <tr><td>OF-18</td><td>Oil filter spin-on</td><td class="q">60</td><td class="q">₹420</td><td class="q">₹25,200</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8 premium</td><td class="q">100</td><td class="q">₹1,312</td><td class="q">₹1,31,200</td></tr>
-            <tr><td colspan="4" class="q">Subtotal</td><td class="q">₹4,28,400</td></tr>
-            <tr><td colspan="4" class="q">GST @ 18%</td><td class="q">₹77,112</td></tr>
-            <tr class="mod-totals-row"><td colspan="4" class="q">Total payable</td><td class="q">₹5,05,512</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-  'SI-5521':{
-    type:'Supplier Invoice',
-    app:'OEM Financials',
-    appSub:'Accounts Payable',
-    id:'SI-5521',
-    status:'matched',
-    statusLabel:'3-way matched',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Invoice header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Invoice #</span><span class="mf-v big">SI-5521</span></div>
-          <div class="mod-field"><span class="mf-k">Invoice date</span><span class="mf-v">23-Apr-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Supplier</span><span class="mf-v">MotoParts Global (SUP-118)</span></div>
-          <div class="mod-field"><span class="mf-k">PO reference</span><span class="mf-v">PO-3314</span></div>
-          <div class="mod-field"><span class="mf-k">GRN reference</span><span class="mf-v">GRN-2041 · WH-MUM</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 45</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">3-way match</div>
-        <table class="mod-table">
-          <thead><tr><th>Check</th><th>Result</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>PO quantity vs invoice qty</td><td class="status-ok">OK</td><td>40 = 40</td></tr>
-            <tr><td>PO price vs invoice price</td><td class="status-ok">OK</td><td>₹4,550 / unit</td></tr>
-            <tr><td>GRN vs invoice qty</td><td class="status-ok">OK</td><td>40 units received</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td class="q">40</td><td class="q">₹4,550</td><td class="q">₹1,82,000</td></tr>
-            <tr class="mod-totals-row"><td colspan="3" class="q">Total</td><td class="q">₹1,82,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Posting</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">AP account</span><span class="mf-v">2110 · Trade Payables</span></div>
-          <div class="mod-field"><span class="mf-k">Due date</span><span class="mf-v">06-Jun-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Posted by</span><span class="mf-v">AP Reconciliation Agent</span></div>
-          <div class="mod-field"><span class="mf-k">GL journal</span><span class="mf-v">JE-2026-04-5521</span></div>
-        </div>
-      </div>
-    `
-  },
-  'SI-5530':{
-    type:'Supplier Invoice',
-    app:'OEM Financials',
-    appSub:'Accounts Payable',
-    id:'SI-5530',
-    status:'matched',
-    statusLabel:'3-way matched',
-    render: ()=>`
-      <div class="mod-section">
-        <div class="mod-section-title">Invoice header</div>
-        <div class="mod-grid">
-          <div class="mod-field"><span class="mf-k">Invoice #</span><span class="mf-v big">SI-5530</span></div>
-          <div class="mod-field"><span class="mf-k">Invoice date</span><span class="mf-v">23-Apr-2026</span></div>
-          <div class="mod-field"><span class="mf-k">Supplier</span><span class="mf-v">MotoParts Global (SUP-118)</span></div>
-          <div class="mod-field"><span class="mf-k">PO reference</span><span class="mf-v">PO-3315 (drop-ship)</span></div>
-          <div class="mod-field"><span class="mf-k">Dealer POD</span><span class="mf-v">POD-DL4421-0422-1</span></div>
-          <div class="mod-field"><span class="mf-k">Payment terms</span><span class="mf-v">Net 45</span></div>
-        </div>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">3-way match · drop-ship variant</div>
-        <table class="mod-table">
-          <thead><tr><th>Check</th><th>Result</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>PO qty vs invoice qty</td><td class="status-ok">OK</td><td>40 = 40</td></tr>
-            <tr><td>PO price vs invoice price</td><td class="status-ok">OK</td><td>₹4,550 / unit</td></tr>
-            <tr><td>Dealer POD vs invoice qty</td><td class="status-ok">OK</td><td>Dealer signed receipt</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="mod-section">
-        <div class="mod-section-title">Line items</div>
-        <table class="mod-table">
-          <thead><tr><th>SKU</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td class="q">40</td><td class="q">₹4,550</td><td class="q">₹1,82,000</td></tr>
-            <tr class="mod-totals-row"><td colspan="3" class="q">Total</td><td class="q">₹1,82,000</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `
-  },
-};
-
-/* ==================== GRAPH NODE DEFS ==================== */
-const GRAPH_NODES = {
-  'reorder':  { type:'agent',  name:'Reorder Sentinel',        sub:'Dealer AI · stock watcher', icon:'A1' },
-  'dealer':   { type:'human',  name:'Spares Manager',          sub:'Dealer · initiates request', icon:'H'  },
-  'processor':{ type:'agent',  name:'Parts Request Processor', sub:'OEM AI · triage + route',    icon:'A2' },
-  'pricelist':{ type:'system', name:'Price List',              sub:'Dealer pricing master',      icon:'S'  },
-  'inv':      { type:'system', name:'Inventory',               sub:'WMS · live stock',           icon:'S'  },
-  'procure':  { type:'agent',  name:'Procurement Agent',       sub:'OEM AI · sourcing',          icon:'A3' },
-  'contract': { type:'system', name:'Supplier Contract',       sub:'SC-2024-MPG-007',            icon:'S'  },
-  'supplier': { type:'human',  name:'Supplier',                sub:'MotoParts Global',           icon:'H'  },
-  'wms':      { type:'system', name:'Warehouse Ops',           sub:'Pick · pack · ship',         icon:'S'  },
-  'shipment': { type:'system', name:'Shipment & POD',          sub:'Tracking · proof of delivery', icon:'S' },
-  'ar':       { type:'agent',  name:'Invoice + AR Agent',      sub:'OEM AI · dealer billing',    icon:'A4' },
-  'ap':       { type:'agent',  name:'AP Reconciliation',       sub:'OEM AI · 3-way match',       icon:'A5' },
-  'fin':      { type:'system', name:'OEM Financials',          sub:'AR · AP ledger',             icon:'S'  },
-};
-
-/* ==================== STEP SEQUENCES ==================== */
-/* Each step: {
-     crumb, phaseTag, title, desc,
-     activeNode, doneNodes, graphOrder (which nodes to show in left graph column),
-     content: HTML for the center work panel,
-     activity: {actor, type, text} to append to activity log,
-     unlockRecord: recordKey to unlock,
-     advanceRecordStatus: [{id, status, statusLabel}] to update any existing record's status
-   }
-*/
-
-const STEPS_INSTOCK = [
-  { crumb:'Receive & triage', phaseTag:'Parts Request Processor',
-    title:'Parts request received from dealer',
-    desc:'The OEM\'s Parts Request Processor agent picks up PR-2046 the moment the dealer submits it. First it validates the dealer and the SKUs against master data.',
-    activeNode:'processor', doneNodes:['reorder','dealer'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Incoming payload</div>
-        <div class="wc-row"><span class="k">Request ID</span><span class="v">PR-2046</span></div>
-        <div class="wc-row"><span class="k">From dealer</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Submitted by</span><span class="v">Ravi Mehta</span></div>
-        <div class="wc-row"><span class="k">SKUs</span><span class="v">3 lines · 200 units total</span></div>
-        <div class="wc-row"><span class="k">Dealer status</span><span class="v ok">Active · credit OK</span></div>
-        <div class="wc-row"><span class="k">SKU validation</span><span class="v ok">3/3 exist in master</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Received <b>PR-2046</b> · validated dealer + SKUs'},
-    unlockRecord:'PR-2046'
-  },
-  { crumb:'Pricing', phaseTag:'Parts Request Processor',
-    title:'Pricing applied from dealer price list',
-    desc:'The Processor agent fetches the dealer\'s active price list and stamps rates on each line. These are the prices the dealer will be invoiced at, regardless of how the OEM sources the parts.',
-    activeNode:'pricelist', doneNodes:['reorder','dealer','processor'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Price list lookup</div>
-        <div class="wc-row"><span class="k">Active price list</span><span class="v hi">PL-DLR-2026Q2</span></div>
-        <div class="wc-row"><span class="k">Effective</span><span class="v">01-Apr-2026 → 30-Jun-2026</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Lines priced</div>
-        <table class="wc-table">
-          <thead><tr><th>SKU</th><th>Description</th><th class="q">Qty</th><th class="q">Rate</th><th class="q">Amount</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td>Brake pad set</td><td class="q">40</td><td class="q">₹6,800</td><td class="q">₹2,72,000</td></tr>
-            <tr><td>OF-18</td><td>Oil filter</td><td class="q">60</td><td class="q">₹420</td><td class="q">₹25,200</td></tr>
-            <tr><td>SP-V8</td><td>Spark plug V8</td><td class="q">100</td><td class="q">₹1,312</td><td class="q">₹1,31,200</td></tr>
-          </tbody>
-        </table>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Priced 3 lines from <b>PL-DLR-2026Q2</b> · total ₹4,28,400'}
-  },
-  { crumb:'Inventory check', phaseTag:'Parts Request Processor',
-    title:'Checking inventory at OEM warehouses',
-    desc:'The agent queries the warehouse management system for real-time stock levels. In this scenario, all three SKUs are available at WH-MUM, the warehouse closest to the dealer.',
-    activeNode:'inv', doneNodes:['reorder','dealer','processor','pricelist'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Stock check · WH-MUM</div>
-        <table class="wc-table">
-          <thead><tr><th>SKU</th><th class="q">Requested</th><th class="q">On hand</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td class="q">40</td><td class="q">78</td><td class="status-ok">Available</td></tr>
-            <tr><td>OF-18</td><td class="q">60</td><td class="q">142</td><td class="status-ok">Available</td></tr>
-            <tr><td>SP-V8</td><td class="q">100</td><td class="q">220</td><td class="status-ok">Available</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="work-card">
-        <div class="wc-decision">
-          <div class="dec-icon">✓</div>
-          <div class="dec-body">
-            <div class="dec-title">Decision: fulfill from OEM warehouse</div>
-            <div class="dec-text">All 3 SKUs are fully covered at WH-MUM. No procurement needed. Routing to Warehouse Ops.</div>
-          </div>
-        </div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Stock check OK · all 3 SKUs available at <b>WH-MUM</b>'},
-    advanceRecordStatus:[{id:'PR-2046', status:'processing', statusLabel:'Processing'}]
-  },
-  { crumb:'Route to warehouse', phaseTag:'Parts Request Processor → WMS',
-    title:'Shipment line created and sent to warehouse',
-    desc:'The agent creates Shipment Line SL-9821 and pushes it into Warehouse Management. The warehouse picker now sees a pick job on their mobile app.',
-    activeNode:'wms', doneNodes:['reorder','dealer','processor','pricelist','inv'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Shipment line created</div>
-        <div class="wc-row"><span class="k">Line #</span><span class="v hi">SL-9821</span></div>
-        <div class="wc-row"><span class="k">Source</span><span class="v">PR-2046</span></div>
-        <div class="wc-row"><span class="k">Warehouse</span><span class="v">WH-MUM</span></div>
-        <div class="wc-row"><span class="k">Ship-to</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Priority</span><span class="v">Standard</span></div>
-        <div class="wc-row"><span class="k">Carrier</span><span class="v">Blue Dart</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Pick list dispatched</div>
-        <div style="font-size:12.5px;color:var(--text-2);line-height:1.6">
-          Warehouse picker <b>Suresh K.</b> on iOS device received a priority pick job with 3 lines across bins A12-03, B04-11, and C19-07. Open SL-9821 on the Records tab to see the full pick list.
-        </div>
-      </div>
-    `,
-    activity:{actor:'system', label:'Warehouse Mgmt', text:'Shipment line <b>SL-9821</b> created · pick job sent to picker'},
-    unlockRecord:'SL-9821'
-  },
-  { crumb:'Pick, pack, ship', phaseTag:'Warehouse Ops',
-    title:'Picker completes pick and warehouse dispatches the shipment',
-    desc:'The picker scans each bin to confirm the SKU and quantity, then hands the consolidated pack to the carrier for dispatch. Shipment SH-9821 is now in transit with an AWB.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','wms'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Pick completed</div>
-        <div class="wc-row"><span class="k">Picker</span><span class="v">Suresh K. (WH-MUM)</span></div>
-        <div class="wc-row"><span class="k">Scan confirmations</span><span class="v ok">3/3 bins · 200 units verified</span></div>
-        <div class="wc-row"><span class="k">Pack</span><span class="v">1 consolidated carton · 18.4 kg</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Shipment dispatched</div>
-        <div class="wc-row"><span class="k">Shipment #</span><span class="v hi">SH-9821</span></div>
-        <div class="wc-row"><span class="k">Carrier</span><span class="v">Blue Dart</span></div>
-        <div class="wc-row"><span class="k">AWB</span><span class="v">774-2091-6</span></div>
-        <div class="wc-row"><span class="k">Dispatched</span><span class="v">22-Apr-2026 · 11:08 IST</span></div>
-        <div class="wc-row"><span class="k">ETA at dealer</span><span class="v">22-Apr-2026 · 17:30 IST</span></div>
-      </div>
-    `,
-    activity:{actor:'system', label:'Warehouse Ops', text:'Picker confirmed · <b>SH-9821</b> dispatched with AWB 774-2091-6'},
-    unlockRecord:'SH-9821',
-    advanceRecordStatus:[{id:'SL-9821', status:'complete', statusLabel:'Picked'}]
-  },
-  { crumb:'Dealer receipt', phaseTag:'Dealer receiving',
-    title:'Dealer confirms receipt — request closed',
-    desc:'At the dealership, the receiving clerk scans the package label on their mobile app. Proof of delivery flows back to Axle and the Parts Request is marked Shipped &amp; Complete.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','wms'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Proof of delivery</div>
-        <div class="wc-row"><span class="k">Received at</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Received by</span><span class="v">Anita V. (receiving clerk)</span></div>
-        <div class="wc-row"><span class="k">Timestamp</span><span class="v">22-Apr-2026 · 17:18 IST</span></div>
-        <div class="wc-row"><span class="k">Condition</span><span class="v ok">Intact · 3/3 SKUs verified</span></div>
-        <div class="wc-row"><span class="k">POD reference</span><span class="v">POD-DL4421-0422-1</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-decision">
-          <div class="dec-icon">✓</div>
-          <div class="dec-body">
-            <div class="dec-title">PR-2046 marked Shipped &amp; Complete</div>
-            <div class="dec-text">Status change is the trigger for the Invoice + AR Agent to generate the dealer invoice next.</div>
-          </div>
-        </div>
-      </div>
-    `,
-    activity:{actor:'human', label:'Dealer receiving', text:'POD confirmed · <b>PR-2046</b> closed as Shipped &amp; Complete'},
-    advanceRecordStatus:[{id:'PR-2046', status:'complete', statusLabel:'Complete'},{id:'SH-9821', status:'complete', statusLabel:'Delivered'}]
-  },
-  { crumb:'Dealer invoice', phaseTag:'Invoice + AR Agent',
-    title:'Invoice generated and posted to Accounts Receivable',
-    desc:'The Invoice + AR Agent builds a GST-compliant invoice using the prices from the dealer price list (not from any supplier contract, since the OEM fulfilled this itself), and posts it to AR in the OEM Financials system.',
-    activeNode:'ar', doneNodes:['reorder','dealer','processor','pricelist','inv','wms','shipment'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Invoice built</div>
-        <div class="wc-row"><span class="k">Invoice #</span><span class="v hi">INV-DLR-8812</span></div>
-        <div class="wc-row"><span class="k">Bill-to</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Priced using</span><span class="v">Dealer price list PL-DLR-2026Q2</span></div>
-        <div class="wc-row"><span class="k">Subtotal</span><span class="v">₹4,28,400</span></div>
-        <div class="wc-row"><span class="k">GST 18%</span><span class="v">₹77,112</span></div>
-        <div class="wc-row"><span class="k">Total</span><span class="v hi">₹5,05,512</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>AR posting</div>
-        <div class="wc-row"><span class="k">AR account</span><span class="v">1210 · Trade Receivables</span></div>
-        <div class="wc-row"><span class="k">Payment terms</span><span class="v">Net 30 · due 22-May-2026</span></div>
-        <div class="wc-row"><span class="k">GL journal</span><span class="v">JE-2026-04-7712</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Invoice + AR Agent', text:'<b>INV-DLR-8812</b> generated · ₹5,05,512 posted to AR'},
-    unlockRecord:'INV-DLR-8812'
-  },
-  { crumb:'Cycle complete', phaseTag:'OEM Financials',
-    title:'Cycle complete — financials reconciled',
-    desc:'This in-stock cycle only involves the dealer leg. There is no supplier invoice because the OEM did not procure for this request. One agent handoff created the invoice; zero human approvals were needed.',
-    activeNode:'fin', doneNodes:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','wms','shipment','ar','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Cycle summary</div>
-        <div class="wc-row"><span class="k">Request</span><span class="v ok">PR-2046 · Complete</span></div>
-        <div class="wc-row"><span class="k">Shipment</span><span class="v ok">SH-9821 · Delivered</span></div>
-        <div class="wc-row"><span class="k">Dealer invoice</span><span class="v ok">INV-DLR-8812 · Posted (AR)</span></div>
-        <div class="wc-row"><span class="k">Purchase order</span><span class="v">— none (in-stock fulfillment)</span></div>
-        <div class="wc-row"><span class="k">Supplier invoice</span><span class="v">— none</span></div>
-        <div class="wc-row"><span class="k">Agents used</span><span class="v">2 · Reorder Sentinel, Parts Req. Processor, AR Agent</span></div>
-        <div class="wc-row"><span class="k">Human touches</span><span class="v">2 · Submit + POD</span></div>
-      </div>
-    `,
-    activity:{actor:'system', label:'OEM Financials', text:'AR ledger updated · cycle <b>PR-2046</b> fully reconciled'}
-  },
-];
-
-/* Out-of-stock: PO ships to OEM WH, OEM consolidates and ships to dealer */
-const STEPS_OOS_OEM = [
-  // shared opening
-  { crumb:'Receive & triage', phaseTag:'Parts Request Processor',
-    title:'Parts request received from dealer',
-    desc:'Same as the in-stock flow — the Parts Request Processor validates dealer and SKUs.',
-    activeNode:'processor', doneNodes:['reorder','dealer'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Incoming payload</div>
-        <div class="wc-row"><span class="k">Request ID</span><span class="v">PR-2046</span></div>
-        <div class="wc-row"><span class="k">From dealer</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">SKUs</span><span class="v">3 lines · 200 units total</span></div>
-        <div class="wc-row"><span class="k">Dealer status</span><span class="v ok">Active · credit OK</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Received <b>PR-2046</b> · validated'},
-    unlockRecord:'PR-2046'
-  },
-  { crumb:'Pricing', phaseTag:'Parts Request Processor',
-    title:'Pricing applied from dealer price list',
-    desc:'Dealer-facing prices always come from the active dealer price list — this is independent of how the OEM will source the parts.',
-    activeNode:'pricelist', doneNodes:['reorder','dealer','processor'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Price list lookup</div>
-        <div class="wc-row"><span class="k">Active price list</span><span class="v hi">PL-DLR-2026Q2</span></div>
-        <div class="wc-row"><span class="k">Total value</span><span class="v">₹4,28,400</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Priced from <b>PL-DLR-2026Q2</b>'}
-  },
-  { crumb:'Inventory check', phaseTag:'Parts Request Processor',
-    title:'Inventory shortfall detected',
-    desc:'When the stock check runs, one SKU is short. The Processor flags the shortfall and hands off the procurement branch to the Procurement Agent while the other two SKUs wait to be consolidated.',
-    activeNode:'inv', doneNodes:['reorder','dealer','processor','pricelist'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Stock check · WH-MUM</div>
-        <table class="wc-table">
-          <thead><tr><th>SKU</th><th class="q">Requested</th><th class="q">On hand</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td class="q">40</td><td class="q">0</td><td class="status-short">Short · 40</td></tr>
-            <tr><td>OF-18</td><td class="q">60</td><td class="q">142</td><td class="status-ok">Available</td></tr>
-            <tr><td>SP-V8</td><td class="q">100</td><td class="q">220</td><td class="status-ok">Available</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="work-card">
-        <div class="wc-decision">
-          <div class="dec-icon">!</div>
-          <div class="dec-body">
-            <div class="dec-title">Decision: engage Procurement Agent</div>
-            <div class="dec-text">40 units of BP-220 must be procured. Handing off to the Procurement Agent. Remaining lines reserved at WH-MUM for consolidation once the supplier shipment arrives.</div>
-          </div>
-        </div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Short on <b>BP-220</b> · engaging Procurement Agent'},
-    advanceRecordStatus:[{id:'PR-2046', status:'processing', statusLabel:'Sourcing'}]
-  },
-  { crumb:'Sourcing', phaseTag:'Procurement Agent',
-    title:'Supplier selected from contract',
-    desc:'The Procurement Agent searches active supplier contracts covering BP-220 and picks MotoParts Global. Prices for the PO will come from contract SC-2024-MPG-007 — not from the dealer price list.',
-    activeNode:'contract', doneNodes:['reorder','dealer','processor','pricelist','inv','procure'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Contract match</div>
-        <div class="wc-row"><span class="k">Contract</span><span class="v hi">SC-2024-MPG-007</span></div>
-        <div class="wc-row"><span class="k">Supplier</span><span class="v">MotoParts Global (SUP-118)</span></div>
-        <div class="wc-row"><span class="k">Covers SKU</span><span class="v">BP-220 · lead time 48h</span></div>
-        <div class="wc-row"><span class="k">Contract rate</span><span class="v hi">₹4,550 / unit</span></div>
-        <div class="wc-row"><span class="k">Ship modes</span><span class="v">DAP to WH-MUM or direct drop-ship</span></div>
-      </div>
-      <div class="work-card">
-        <div class="wc-decision">
-          <div class="dec-icon">→</div>
-          <div class="dec-body">
-            <div class="dec-title">Decision: ship to OEM warehouse</div>
-            <div class="dec-text">OEM is consolidating with on-hand stock for the other 2 SKUs, so the supplier ships to WH-MUM first.</div>
-          </div>
-        </div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Procurement Agent', text:'Matched contract <b>SC-2024-MPG-007</b> · route via WH-MUM'}
-  },
-  { crumb:'PO issued', phaseTag:'Procurement Agent → Supplier',
-    title:'Purchase order issued to supplier',
-    desc:'The Procurement Agent issues PO-3314 to MotoParts Global for 40 units of BP-220 at the contract rate. The supplier\'s portal receives it automatically.',
-    activeNode:'supplier', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>PO summary</div>
-        <div class="wc-row"><span class="k">PO #</span><span class="v hi">PO-3314</span></div>
-        <div class="wc-row"><span class="k">Supplier</span><span class="v">MotoParts Global</span></div>
-        <div class="wc-row"><span class="k">Line</span><span class="v">BP-220 × 40 @ ₹4,550</span></div>
-        <div class="wc-row"><span class="k">PO total</span><span class="v">₹1,82,000</span></div>
-        <div class="wc-row"><span class="k">Ship-to</span><span class="v">Axle WH-MUM</span></div>
-        <div class="wc-row"><span class="k">Incoterms</span><span class="v">DAP WH-MUM</span></div>
-        <div class="wc-row"><span class="k">Payment terms</span><span class="v">Net 45</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Procurement Agent', text:'<b>PO-3314</b> issued · ship to WH-MUM · ₹1,82,000'},
-    unlockRecord:'PO-3314'
-  },
-  { crumb:'Supplier ack & ship', phaseTag:'Supplier',
-    title:'Supplier accepts and ships to the OEM warehouse',
-    desc:'MotoParts Global accepts on their portal and dispatches. On arrival at WH-MUM, the warehouse posts a GRN against PO-3314.',
-    activeNode:'wms', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Supplier shipment</div>
-        <div class="wc-row"><span class="k">Supplier AWB</span><span class="v">MPG-77821</span></div>
-        <div class="wc-row"><span class="k">Dispatched</span><span class="v">22-Apr-2026 · 16:00 IST</span></div>
-        <div class="wc-row"><span class="k">Arrived WH-MUM</span><span class="v">23-Apr-2026 · 08:30 IST</span></div>
-        <div class="wc-row"><span class="k">GRN</span><span class="v ok">GRN-2041 · 40 × BP-220 verified</span></div>
-      </div>
-    `,
-    activity:{actor:'human', label:'Supplier', text:'PO-3314 accepted · shipment arrived · GRN-2041 posted'},
-    advanceRecordStatus:[{id:'PO-3314', status:'complete', statusLabel:'Received'}]
-  },
-  { crumb:'Consolidate & ship', phaseTag:'Warehouse Ops',
-    title:'Warehouse consolidates and dispatches to dealer',
-    desc:'With the inbound BP-220 now in stock, the warehouse releases the full pick (all 3 SKUs) and dispatches consolidated shipment SH-9844 to the dealer.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Consolidated shipment</div>
-        <div class="wc-row"><span class="k">Shipment #</span><span class="v hi">SH-9844</span></div>
-        <div class="wc-row"><span class="k">AWB</span><span class="v">774-3318-9</span></div>
-        <div class="wc-row"><span class="k">Contents</span><span class="v">BP-220 × 40 (supplier GRN) + OF-18 × 60 + SP-V8 × 100 (on-hand)</span></div>
-        <div class="wc-row"><span class="k">Dispatched</span><span class="v">23-Apr-2026 · 10:15 IST</span></div>
-      </div>
-    `,
-    activity:{actor:'system', label:'Warehouse Ops', text:'Consolidated pack · <b>SH-9844</b> dispatched'},
-    unlockRecord:'SH-9844'
-  },
-  { crumb:'Dealer receipt', phaseTag:'Dealer receiving',
-    title:'Dealer confirms receipt — request closed',
-    desc:'Dealer scans the package. Proof of delivery posts back to Axle, and PR-2046 closes as Shipped &amp; Complete.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Proof of delivery</div>
-        <div class="wc-row"><span class="k">Received at</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Timestamp</span><span class="v">23-Apr-2026 · 17:42 IST</span></div>
-        <div class="wc-row"><span class="k">POD reference</span><span class="v">POD-DL4421-0423-1</span></div>
-      </div>
-    `,
-    activity:{actor:'human', label:'Dealer receiving', text:'POD received · <b>PR-2046</b> Shipped &amp; Complete'},
-    advanceRecordStatus:[{id:'PR-2046', status:'complete', statusLabel:'Complete'},{id:'SH-9844', status:'complete', statusLabel:'Delivered'}]
-  },
-  { crumb:'Dealer invoice', phaseTag:'Invoice + AR Agent',
-    title:'Dealer invoice generated and posted to AR',
-    desc:'Priced from the dealer price list as always. Note this is the same amount as the in-stock scenario — the dealer pays the same whether OEM fulfilled from stock or procured.',
-    activeNode:'ar', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Invoice built</div>
-        <div class="wc-row"><span class="k">Invoice #</span><span class="v hi">INV-DLR-8819</span></div>
-        <div class="wc-row"><span class="k">Priced using</span><span class="v">PL-DLR-2026Q2 (dealer price list)</span></div>
-        <div class="wc-row"><span class="k">Subtotal</span><span class="v">₹4,28,400</span></div>
-        <div class="wc-row"><span class="k">Total with GST</span><span class="v hi">₹5,05,512</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Invoice + AR Agent', text:'<b>INV-DLR-8819</b> posted to AR · ₹5,05,512'},
-    unlockRecord:'INV-DLR-8819'
-  },
-  { crumb:'Supplier invoice · 3-way match', phaseTag:'AP Reconciliation Agent',
-    title:'Supplier invoice received and 3-way matched',
-    desc:'MotoParts submits invoice SI-5521 against PO-3314. The AP Reconciliation Agent performs an automated 3-way match (PO + GRN + invoice) and, since all three match, posts it to AP with no human approval needed.',
-    activeNode:'ap', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>3-way match</div>
-        <table class="wc-table">
-          <thead><tr><th>Check</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>PO qty vs invoice qty</td><td>40</td><td>40</td><td class="status-ok">OK</td></tr>
-            <tr><td>PO price vs invoice price</td><td>₹4,550</td><td>₹4,550</td><td class="status-ok">OK</td></tr>
-            <tr><td>GRN qty vs invoice qty</td><td>40</td><td>40</td><td class="status-ok">OK</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>AP posting</div>
-        <div class="wc-row"><span class="k">Invoice #</span><span class="v hi">SI-5521</span></div>
-        <div class="wc-row"><span class="k">Amount</span><span class="v">₹1,82,000</span></div>
-        <div class="wc-row"><span class="k">Payment terms</span><span class="v">Net 45 · due 06-Jun-2026</span></div>
-        <div class="wc-row"><span class="k">Posted by</span><span class="v">AP Reconciliation Agent</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'AP Reconciliation', text:'<b>SI-5521</b> matched &amp; posted to AP'},
-    unlockRecord:'SI-5521'
-  },
-  { crumb:'Cycle complete', phaseTag:'OEM Financials',
-    title:'Cycle complete — AR + AP both posted',
-    desc:'Full end-to-end cycle: dealer got their parts, OEM booked the receivable, and the supplier\'s payable is set up for payment on terms. Four agents handled everything with only two human touchpoints.',
-    activeNode:'fin', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','wms','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Cycle summary</div>
-        <div class="wc-row"><span class="k">Request</span><span class="v ok">PR-2046 · Complete</span></div>
-        <div class="wc-row"><span class="k">Purchase order</span><span class="v ok">PO-3314 · Received</span></div>
-        <div class="wc-row"><span class="k">Shipment</span><span class="v ok">SH-9844 · Delivered</span></div>
-        <div class="wc-row"><span class="k">Dealer invoice (AR)</span><span class="v ok">INV-DLR-8819 · Posted</span></div>
-        <div class="wc-row"><span class="k">Supplier invoice (AP)</span><span class="v ok">SI-5521 · Matched</span></div>
-        <div class="wc-row"><span class="k">Agents used</span><span class="v">5</span></div>
-        <div class="wc-row"><span class="k">Human touches</span><span class="v">3 · Submit + POD + Supplier ack</span></div>
-      </div>
-    `,
-    activity:{actor:'system', label:'OEM Financials', text:'AR + AP ledgers updated · cycle fully reconciled'}
-  },
-];
-
-/* Out-of-stock, drop-ship variant */
-const STEPS_OOS_DROP = [
-  { crumb:'Receive & triage', phaseTag:'Parts Request Processor',
-    title:'Parts request received from dealer',
-    desc:'Same intake step — agent validates dealer and SKUs.',
-    activeNode:'processor', doneNodes:['reorder','dealer'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Incoming payload</div>
-        <div class="wc-row"><span class="k">Request ID</span><span class="v">PR-2046</span></div>
-        <div class="wc-row"><span class="k">From dealer</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">SKUs</span><span class="v">3 lines · 200 units total</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Received <b>PR-2046</b> · validated'},
-    unlockRecord:'PR-2046'
-  },
-  { crumb:'Pricing', phaseTag:'Parts Request Processor',
-    title:'Pricing from dealer price list',
-    desc:'Dealer rates come from the dealer price list regardless of sourcing.',
-    activeNode:'pricelist', doneNodes:['reorder','dealer','processor'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Price list lookup</div>
-        <div class="wc-row"><span class="k">Active price list</span><span class="v hi">PL-DLR-2026Q2</span></div>
-        <div class="wc-row"><span class="k">Total value</span><span class="v">₹4,28,400</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Priced from <b>PL-DLR-2026Q2</b>'}
-  },
-  { crumb:'Inventory check', phaseTag:'Parts Request Processor',
-    title:'Stock gap — supplier route with drop-ship recommendation',
-    desc:'Stock check shows a gap. The Processor notes that the dealer is located near the supplier\'s Pune hub, so it recommends the drop-ship route to save time and freight.',
-    activeNode:'inv', doneNodes:['reorder','dealer','processor','pricelist'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Stock check · WH-MUM</div>
-        <table class="wc-table">
-          <thead><tr><th>SKU</th><th class="q">Requested</th><th class="q">On hand</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>BP-220</td><td class="q">40</td><td class="q">0</td><td class="status-short">Short</td></tr>
-            <tr><td>OF-18</td><td class="q">60</td><td class="q">0</td><td class="status-short">Short</td></tr>
-            <tr><td>SP-V8</td><td class="q">100</td><td class="q">0</td><td class="status-short">Short</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="work-card">
-        <div class="wc-decision">
-          <div class="dec-icon">→</div>
-          <div class="dec-body">
-            <div class="dec-title">Decision: engage Procurement · recommend drop-ship</div>
-            <div class="dec-text">All 3 SKUs covered by a single supplier. Dealer is closer to the supplier hub than to WH-MUM. Drop-ship saves ~18 hours and one leg of freight.</div>
-          </div>
-        </div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Parts Req. Processor', text:'Full stock gap · recommending drop-ship'},
-    advanceRecordStatus:[{id:'PR-2046', status:'processing', statusLabel:'Sourcing'}]
-  },
-  { crumb:'Sourcing', phaseTag:'Procurement Agent',
-    title:'Supplier contract matched with drop-ship clause',
-    desc:'The Procurement Agent confirms the contract supports direct-to-dealer shipment and locks in contract rates for the PO.',
-    activeNode:'contract', doneNodes:['reorder','dealer','processor','pricelist','inv','procure'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Contract match</div>
-        <div class="wc-row"><span class="k">Contract</span><span class="v hi">SC-2024-MPG-007</span></div>
-        <div class="wc-row"><span class="k">Drop-ship clause</span><span class="v ok">Enabled</span></div>
-        <div class="wc-row"><span class="k">Contract rate · BP-220</span><span class="v">₹4,550 / unit</span></div>
-        <div class="wc-row"><span class="k">Contract rate · OF-18</span><span class="v">₹310 / unit</span></div>
-        <div class="wc-row"><span class="k">Contract rate · SP-V8</span><span class="v">₹920 / unit</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Procurement Agent', text:'Drop-ship clause confirmed on <b>SC-2024-MPG-007</b>'}
-  },
-  { crumb:'PO issued', phaseTag:'Procurement Agent → Supplier',
-    title:'Drop-ship PO issued to supplier',
-    desc:'PO-3315 is issued with the dealer\'s address as ship-to. Supplier will ship directly.',
-    activeNode:'supplier', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Drop-ship PO</div>
-        <div class="wc-row"><span class="k">PO #</span><span class="v hi">PO-3315</span></div>
-        <div class="wc-row"><span class="k">Supplier</span><span class="v">MotoParts Global</span></div>
-        <div class="wc-row"><span class="k">Ship-to</span><span class="v hi">Dealer DL-4421 (drop-ship)</span></div>
-        <div class="wc-row"><span class="k">PO total</span><span class="v">₹1,82,000</span></div>
-        <div class="wc-row"><span class="k">Incoterms</span><span class="v">DAP Dealer</span></div>
-        <div class="wc-row"><span class="k">Note to supplier</span><span class="v">Pack with Axle waybill template</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Procurement Agent', text:'<b>PO-3315</b> issued · drop-ship to dealer'},
-    unlockRecord:'PO-3315'
-  },
-  { crumb:'Supplier dispatches', phaseTag:'Supplier',
-    title:'Supplier ships directly to dealer',
-    desc:'No OEM warehouse involvement on this leg — the supplier dispatches straight from their Pune hub to the dealer.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Drop-ship dispatch</div>
-        <div class="wc-row"><span class="k">Shipment #</span><span class="v hi">SH-9901</span></div>
-        <div class="wc-row"><span class="k">From</span><span class="v">MotoParts Global · Pune hub</span></div>
-        <div class="wc-row"><span class="k">To</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">AWB</span><span class="v">881-3094-2</span></div>
-        <div class="wc-row"><span class="k">Dispatched</span><span class="v">22-Apr-2026 · 14:20 IST</span></div>
-      </div>
-    `,
-    activity:{actor:'human', label:'Supplier', text:'Drop-ship <b>SH-9901</b> dispatched to dealer'},
-    unlockRecord:'SH-9901',
-    advanceRecordStatus:[{id:'PO-3315', status:'shipped', statusLabel:'Shipped'}]
-  },
-  { crumb:'Dealer receipt', phaseTag:'Dealer receiving',
-    title:'Dealer confirms receipt — request closed',
-    desc:'Dealer gets the package directly from the supplier and scans to confirm. Proof of delivery flows to both Axle (to close the request + trigger AR) and is referenced by AP for the 3-way match.',
-    activeNode:'shipment', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Proof of delivery</div>
-        <div class="wc-row"><span class="k">Received at</span><span class="v">DL-4421 · Mumbai East</span></div>
-        <div class="wc-row"><span class="k">Timestamp</span><span class="v">22-Apr-2026 · 19:05 IST</span></div>
-        <div class="wc-row"><span class="k">POD reference</span><span class="v">POD-DL4421-0422-1</span></div>
-        <div class="wc-row"><span class="k">Condition</span><span class="v ok">Intact · qty match</span></div>
-      </div>
-    `,
-    activity:{actor:'human', label:'Dealer receiving', text:'Drop-ship POD received · <b>PR-2046</b> closed'},
-    advanceRecordStatus:[{id:'PR-2046', status:'complete', statusLabel:'Complete'},{id:'SH-9901', status:'complete', statusLabel:'Delivered'}]
-  },
-  { crumb:'Dealer invoice', phaseTag:'Invoice + AR Agent',
-    title:'Dealer invoice posted to AR',
-    desc:'The dealer invoice follows the same pattern — priced from the dealer price list, same total.',
-    activeNode:'ar', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Invoice built</div>
-        <div class="wc-row"><span class="k">Invoice #</span><span class="v hi">INV-DLR-8825</span></div>
-        <div class="wc-row"><span class="k">Priced using</span><span class="v">PL-DLR-2026Q2 (dealer price list)</span></div>
-        <div class="wc-row"><span class="k">Total with GST</span><span class="v hi">₹5,05,512</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'Invoice + AR Agent', text:'<b>INV-DLR-8825</b> posted to AR'},
-    unlockRecord:'INV-DLR-8825'
-  },
-  { crumb:'Supplier invoice · 3-way match', phaseTag:'AP Reconciliation Agent',
-    title:'Supplier invoice matched using dealer POD',
-    desc:'In drop-ship, the 3-way match uses PO + dealer POD (instead of an OEM GRN) + supplier invoice. All three line up, so the AP agent posts without human approval.',
-    activeNode:'ap', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>3-way match · drop-ship variant</div>
-        <table class="wc-table">
-          <thead><tr><th>Check</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>PO qty vs invoice qty</td><td>40</td><td>40</td><td class="status-ok">OK</td></tr>
-            <tr><td>PO price vs invoice price</td><td>₹4,550</td><td>₹4,550</td><td class="status-ok">OK</td></tr>
-            <tr><td>Dealer POD vs invoice qty</td><td>40</td><td>40</td><td class="status-ok">OK</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>AP posting</div>
-        <div class="wc-row"><span class="k">Invoice #</span><span class="v hi">SI-5530</span></div>
-        <div class="wc-row"><span class="k">Amount</span><span class="v">₹1,82,000</span></div>
-        <div class="wc-row"><span class="k">Payment terms</span><span class="v">Net 45</span></div>
-      </div>
-    `,
-    activity:{actor:'agent', label:'AP Reconciliation', text:'<b>SI-5530</b> matched (PO + POD + invoice)'},
-    unlockRecord:'SI-5530'
-  },
-  { crumb:'Cycle complete', phaseTag:'OEM Financials',
-    title:'Cycle complete — fastest path for the dealer',
-    desc:'Drop-ship eliminated one shipment leg entirely. The dealer received parts ~18 hours faster than the OEM-warehouse route. Agent count and AR/AP posting are identical.',
-    activeNode:'fin', doneNodes:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap'],
-    graphOrder:['reorder','dealer','processor','pricelist','inv','procure','contract','supplier','shipment','ar','ap','fin'],
-    content:`
-      <div class="work-card">
-        <div class="wc-label"><span class="wc-dot"></span>Cycle summary</div>
-        <div class="wc-row"><span class="k">Request</span><span class="v ok">PR-2046 · Complete</span></div>
-        <div class="wc-row"><span class="k">Purchase order</span><span class="v ok">PO-3315 · Shipped to dealer</span></div>
-        <div class="wc-row"><span class="k">Shipment</span><span class="v ok">SH-9901 · Delivered (drop-ship)</span></div>
-        <div class="wc-row"><span class="k">Dealer invoice (AR)</span><span class="v ok">INV-DLR-8825 · Posted</span></div>
-        <div class="wc-row"><span class="k">Supplier invoice (AP)</span><span class="v ok">SI-5530 · Matched</span></div>
-        <div class="wc-row"><span class="k">Legs of freight</span><span class="v">1 (vs 2 in OEM-warehouse route)</span></div>
-      </div>
-    `,
-    activity:{actor:'system', label:'OEM Financials', text:'Drop-ship cycle reconciled · AR + AP posted'}
-  },
-];
-
-const SCENARIOS = {
-  'instock':  { name:'In-stock · OEM warehouse fulfills',  steps: STEPS_INSTOCK },
-  'oos-oem':  { name:'Out-of-stock · PO → OEM warehouse', steps: STEPS_OOS_OEM },
-  'oos-drop': { name:'Out-of-stock · drop-ship to dealer',steps: STEPS_OOS_DROP },
-};
-
-/* ==================== PAGE 1 · CHAT RENDERER ==================== */
-const chatBody = document.getElementById('chatBody');
-
-function renderChat(){
-  chatBody.innerHTML = '';
-  // Message 1: Reorder Sentinel bot post
-  const m1 = document.createElement('div');
-  m1.className = 'msg';
-  m1.innerHTML = `
-    <div class="avatar av-bot">R</div>
-    <div class="msg-body">
-      <div class="msg-head">
-        <span class="msg-name">Reorder Sentinel</span>
-        <span class="msg-tag">Bot</span>
-        <span class="msg-time">09:22</span>
-      </div>
-      <div class="msg-text"><b>Heads up, Ravi.</b> 3 parts dropped below reorder level overnight at <b>Dealer DL-4421 · Mumbai East</b>. I've drafted a parts request you can send to Axle OEM with one tap.</div>
-      <div class="msg-card">
-        <div class="mc-label">Suggested parts request</div>
-        <div class="mc-title">PR-2046 · Draft</div>
-        <table class="mc-table">
-          <tr><td class="sku">BP-220 · Brake pad set (front)</td><td class="q">40</td></tr>
-          <tr><td class="sku">OF-18 · Oil filter spin-on</td><td class="q">60</td></tr>
-          <tr><td class="sku">SP-V8 · Spark plug V8 premium</td><td class="q">100</td></tr>
-        </table>
-        <div class="mc-actions">
-          <button class="mc-btn" id="editRequestBtn">Edit quantities</button>
-          <button class="mc-btn primary" id="orderPartsBtn">
-            Order parts
-            <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-  chatBody.appendChild(m1);
-  setTimeout(()=>m1.classList.add('in'), 40);
-
-  document.getElementById('orderPartsBtn').addEventListener('click', ()=>{
-    // Add confirmation messages, then after a beat, transition
-    addSubmittedMessages();
-    setTimeout(transitionToConsole, 1400);
-  });
-  document.getElementById('editRequestBtn').addEventListener('click', ()=>{
-    alert('Edit mode — in the real app you\'d adjust quantities here. Close this and click "Order parts" to proceed.');
-  });
-}
-
-function addSubmittedMessages(){
-  // user reply
-  const m2 = document.createElement('div');
-  m2.className = 'msg';
-  m2.innerHTML = `
-    <div class="avatar av-user">R</div>
-    <div class="msg-body">
-      <div class="msg-head">
-        <span class="msg-name">Ravi Mehta</span>
-        <span class="msg-tag you">You</span>
-        <span class="msg-time">09:24</span>
-      </div>
-      <div class="msg-text">Tapped <b>Order parts</b>. Request submitted.</div>
-    </div>
-  `;
-  chatBody.appendChild(m2);
-  setTimeout(()=>m2.classList.add('in'), 40);
-
-  // OEM confirmation from a second bot
-  setTimeout(()=>{
-    const m3 = document.createElement('div');
-    m3.className = 'msg';
-    m3.innerHTML = `
-      <div class="avatar av-oem">A</div>
-      <div class="msg-body">
-        <div class="msg-head">
-          <span class="msg-name">Axle OEM</span>
-          <span class="msg-tag oem">Bot</span>
-          <span class="msg-time">09:24</span>
-        </div>
-        <div class="msg-text">Request <b>PR-2046</b> received. Our agents are processing it now — opening the orchestration console…</div>
-      </div>
-    `;
-    chatBody.appendChild(m3);
-    setTimeout(()=>m3.classList.add('in'), 40);
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }, 650);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-/* ==================== PAGE TRANSITION ==================== */
-function transitionToConsole(){
-  document.getElementById('page-chat').classList.remove('active');
-  document.getElementById('page-console').classList.add('active');
-  // reset step state to beginning
-  state.stepIndex = 0;
-  state.activity = [];
-  state.records = {};
-  updateConsole();
-  document.getElementById('pageCrumb').innerHTML = 'STEP <b>2</b> · OEM ORCHESTRATION';
-}
-
-function transitionToChat(){
-  document.getElementById('page-console').classList.remove('active');
-  document.getElementById('page-chat').classList.add('active');
-  renderChat();
-  document.getElementById('pageCrumb').innerHTML = 'STEP <b>1</b> · DEALER INITIATION';
-}
-
-/* ==================== PAGE 2 · CONSOLE RENDERER ==================== */
-function currentSteps(){ return SCENARIOS[state.scenario].steps; }
-
-function renderStepCrumbs(){
-  const crumbs = document.getElementById('stepCrumbs');
-  crumbs.innerHTML = '';
-  const steps = currentSteps();
-  steps.forEach((s, i)=>{
-    const el = document.createElement('div');
-    let cls = 'step-crumb';
-    if(i < state.stepIndex) cls += ' done';
-    else if(i === state.stepIndex) cls += ' current';
-    el.className = cls;
-    el.innerHTML = `<span class="step-num">${i+1}</span><span>${s.crumb}</span>`;
-    crumbs.appendChild(el);
-  });
-}
-
-function renderGraph(){
-  const list = document.getElementById('graphList');
-  list.innerHTML = '';
-  const step = currentSteps()[state.stepIndex];
-  const order = step.graphOrder;
-  order.forEach((nodeId, idx)=>{
-    const nodeDef = GRAPH_NODES[nodeId];
-    let cls = `graph-node ${nodeDef.type}`;
-    if(step.doneNodes.includes(nodeId)) cls += ' done';
-    if(step.activeNode === nodeId) cls += ' active';
-    const el = document.createElement('div');
-    el.className = cls;
-    el.innerHTML = `
-      <div class="gn-status"></div>
-      <div class="gn-icon">${nodeDef.icon}</div>
-      <div class="gn-body">
-        <div class="gn-type">${nodeDef.type === 'agent' ? 'Agent' : nodeDef.type === 'system' ? 'System' : 'Human'}</div>
-        <div class="gn-name">${nodeDef.name}</div>
-        <div class="gn-sub">${nodeDef.sub}</div>
-      </div>
-    `;
-    list.appendChild(el);
-    if(idx < order.length - 1){
-      const conn = document.createElement('div');
-      let ccls = 'connector';
-      if(step.doneNodes.includes(nodeId)) ccls += ' done';
-      conn.className = ccls;
-      list.appendChild(conn);
-    }
-  });
-}
-
-function renderWorkCol(){
-  const step = currentSteps()[state.stepIndex];
-  const wc = document.getElementById('workCol');
-  wc.innerHTML = `
-    <div class="work-phase-tag">${step.phaseTag}</div>
-    <h2 class="work-title">${step.title}</h2>
-    <div class="work-desc">${step.desc}</div>
-    ${step.content}
-  `;
-  wc.scrollTop = 0;
-}
-
-function renderActivity(){
-  const list = document.getElementById('activityList');
-  list.innerHTML = '';
-  if(state.activity.length === 0){
-    list.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text-3);padding:14px 4px;letter-spacing:.02em">No activity yet. Click Next to advance the flow.</div>`;
-    return;
-  }
-  // show newest first
-  state.activity.slice().reverse().forEach(a=>{
-    const el = document.createElement('div');
-    el.className = 'activity-item';
-    el.innerHTML = `
-      <div class="ai-time">${a.time}</div>
-      <div class="ai-body">
-        <span class="ai-actor ${a.actor}">${a.label}</span>
-        <div class="ai-text">${a.text}</div>
-      </div>
-    `;
-    list.appendChild(el);
-  });
-}
-
-function renderRecords(){
-  const list = document.getElementById('recordsList');
-  list.innerHTML = '';
-  // Which records are possible in this scenario (anything referenced by unlockRecord or advanceRecordStatus)
-  const steps = currentSteps();
-  const allRecordIds = new Set();
-  steps.forEach(s=>{
-    if(s.unlockRecord) allRecordIds.add(s.unlockRecord);
-    if(s.advanceRecordStatus) s.advanceRecordStatus.forEach(a=>allRecordIds.add(a.id));
-  });
-
-  [...allRecordIds].forEach(id=>{
-    const def = RECORD_DEFS[id];
-    if(!def) return;
-    const isUnlocked = !!state.records[id];
-    const currentStatus = isUnlocked ? state.records[id].status : def.status;
-    const currentLabel  = isUnlocked ? state.records[id].statusLabel : def.statusLabel;
-
-    const el = document.createElement('div');
-    el.className = 'rec-item' + (isUnlocked ? ' unlocked' : '');
-    el.innerHTML = `
-      <div class="rec-type">${def.type}</div>
-      <div class="rec-id">${def.id}</div>
-      <div class="rec-sub">${def.app} · ${def.appSub}</div>
-      <div class="rec-sub" style="margin-top:6px">
-        ${isUnlocked
-          ? `<span class="mod-status ${currentStatus}" style="padding:2px 8px;font-size:9px">${currentLabel}</span>`
-          : `<span class="rec-lock">🔒 Unlocks when created in the flow</span>`}
-      </div>
-      ${isUnlocked ? `<div class="rec-link">Open record <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>` : ''}
-    `;
-    if(isUnlocked){
-      el.addEventListener('click', ()=>openRecordModal(id));
-    }
-    list.appendChild(el);
-  });
-}
-
-function updateConsole(){
-  renderStepCrumbs();
-  renderGraph();
-  renderWorkCol();
-  renderActivity();
-  renderRecords();
-  // button states
-  document.getElementById('prevBtn').disabled = state.stepIndex === 0;
-  const nextBtn = document.getElementById('nextBtn');
-  if(state.stepIndex === currentSteps().length - 1){
-    nextBtn.innerHTML = 'Restart scenario <svg viewBox="0 0 12 12" fill="none"><path d="M2 2v3h3M2 5l2-2a4 4 0 104 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  } else {
-    nextBtn.innerHTML = 'Next <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  }
-}
-
-/* ==================== RECORD MODAL ==================== */
-function openRecordModal(recordId){
-  const def = RECORD_DEFS[recordId];
-  if(!def) return;
-  const rec = state.records[recordId] || {};
-  const status = rec.status || def.status;
-  const label = rec.statusLabel || def.statusLabel;
-
-  const overlay = document.getElementById('modalOverlay');
-  const content = document.getElementById('modalContent');
-  content.innerHTML = `
-    <div class="mod-appbar">
-      <b>${def.app}</b>
-      <span class="ab-sep">/</span>
-      <span>${def.appSub}</span>
-      <button class="ab-close" id="modClose">Close</button>
-    </div>
-    <div class="mod-header">
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
       <div>
-        <div class="mod-breadcrumb">${def.type} · ${def.id}</div>
-        <h2 class="mod-title">${def.type} ${def.id}</h2>
+        <div class="hero-eyebrow">
+          <span class="live-dot"></span>
+          <span>Interactive client demo · Release candidate</span>
+        </div>
+        <h1 class="hero-title">
+          Parts fulfillment, <em>orchestrated by agents</em>, end to end.
+        </h1>
+        <p class="hero-lead">
+          A dealer's reorder alert becomes a settled invoice in both AR and AP ledgers — with <b>five AI agents</b> coordinating across the OEM, dealer network, and supplier ecosystem, and only <b>two human touchpoints</b> along the way.
+        </p>
+        <div class="hero-ctas">
+          <a href="axle-oem-parts-walkthrough.html" class="btn-primary">
+            Launch interactive walkthrough
+            <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#overview" class="btn-secondary">
+            See how it works
+          </a>
+        </div>
+        <div class="hero-meta">
+          <div><b>~8 min</b> guided walkthrough</div>
+          <div><b>3 scenarios</b> · in-stock, procure, drop-ship</div>
+          <div><b>Click-through</b> control at every step</div>
+        </div>
       </div>
-      <div class="mod-status ${status}">${label}</div>
+
+      <div class="hero-visual">
+        <div class="preview-card pc-1">
+          <div class="pc-label">Parts Request</div>
+          <div class="pc-title">PR-2046</div>
+          <div class="pc-row"><span class="k">Dealer</span><span class="v">DL-4421</span></div>
+          <div class="pc-row"><span class="k">Lines</span><span class="v">3 SKUs · 200 units</span></div>
+          <div class="pc-row"><span class="k">Value</span><span class="v hi">₹4,28,400</span></div>
+          <span class="pc-badge primary">Submitted</span>
+        </div>
+        <div class="preview-card pc-2">
+          <div class="pc-label">Purchase Order</div>
+          <div class="pc-title">PO-3314</div>
+          <div class="pc-row"><span class="k">Supplier</span><span class="v">MotoParts Global</span></div>
+          <div class="pc-row"><span class="k">Contract</span><span class="v">SC-2024-MPG-007</span></div>
+          <div class="pc-row"><span class="k">Ship-to</span><span class="v">Axle WH-MUM</span></div>
+          <span class="pc-badge amber">Open</span>
+        </div>
+        <div class="preview-card pc-3">
+          <div class="pc-label">AR Invoice · Posted</div>
+          <div class="pc-title">INV-DLR-8812</div>
+          <div class="pc-row"><span class="k">Bill-to</span><span class="v">DL-4421</span></div>
+          <div class="pc-row"><span class="k">Priced using</span><span class="v">PL-DLR-2026Q2</span></div>
+          <div class="pc-row"><span class="k">Total payable</span><span class="v hi">₹5,05,512</span></div>
+          <span class="pc-badge ok">3-way matched</span>
+        </div>
+      </div>
     </div>
-    <div class="mod-tabs">
-      <button class="mod-tab active">Overview</button>
-      <button class="mod-tab">Lines</button>
-      <button class="mod-tab">Activity</button>
-      <button class="mod-tab">Attachments</button>
+  </div>
+</section>
+
+<!-- ============ STATS STRIP ============ -->
+<div class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">5</div>
+        <div class="stat-label">AI agents · specialized</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">2</div>
+        <div class="stat-label">Human touchpoints · submit &amp; POD</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Fulfillment scenarios · modeled</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Human approvals · in happy path</div>
+      </div>
     </div>
-    <div class="mod-body">
-      ${def.render()}
+  </div>
+</div>
+
+<!-- ============ PROBLEM / SOLUTION ============ -->
+<section id="overview">
+  <div class="container">
+    <div class="section-eyebrow">The Feature</div>
+    <h2 class="section-title">From reorder alert to reconciled ledgers — without the manual handoffs.</h2>
+
+    <div class="narrative">
+      <div class="narrative-col problem">
+        <h3><span class="pill">Today</span></h3>
+        <p class="lead">Parts requisitions at automotive OEMs travel through a dozen inboxes before goods move.</p>
+        <p>
+          A dealer emails a reorder request. An inside-sales rep keys it into the order system. A planner eyeballs inventory and decides whether to ship from stock or buy. A buyer raises the PO. A billing clerk raises the invoice. AP waits on a paper supplier invoice to match manually. Errors compound, lead times slip, and finance closes late.
+        </p>
+      </div>
+      <div class="narrative-col solution">
+        <h3><span class="pill">With Axle</span></h3>
+        <p class="lead">A coordinated group of agents owns the workflow end-to-end, with clear systems of record at every step.</p>
+        <p>
+          A reorder-watching agent drafts the request. A processor agent triages, prices, and routes it. A procurement agent sources when inventory is short. An AR agent bills the dealer the moment the shipment ships. An AP agent 3-way matches the supplier invoice. Humans stay in the loop for consent and proof of delivery — nothing else.
+        </p>
+      </div>
     </div>
-  `;
-  overlay.classList.add('open');
-  document.getElementById('modClose').addEventListener('click', closeRecordModal);
-  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeRecordModal(); });
-}
+  </div>
+</section>
 
-function closeRecordModal(){
-  document.getElementById('modalOverlay').classList.remove('open');
-}
+<!-- ============ AGENTS ============ -->
+<section id="agents" style="padding-top:40px">
+  <div class="container">
+    <div class="agents-intro">
+      <div>
+        <div class="section-eyebrow">The Cast</div>
+        <h2 class="section-title">Five agents. One clean handoff pipeline.</h2>
+        <p class="section-lead">
+          Each agent owns a narrow responsibility with a clear input, a clear output, and a single system of record it writes to. No agent is a general-purpose AI — they are purpose-built components assembled into a flow.
+        </p>
+      </div>
+      <div style="text-align:right">
+        <div class="agents-count">05</div>
+        <div class="agents-count-sub">Purpose-built agents</div>
+      </div>
+    </div>
 
-/* ==================== NAVIGATION ==================== */
-function advanceStep(){
-  const steps = currentSteps();
-  if(state.stepIndex >= steps.length - 1){
-    // Restart
-    state.stepIndex = 0;
-    state.activity = [];
-    state.records = {};
-    updateConsole();
-    return;
-  }
-  state.stepIndex++;
-  const step = steps[state.stepIndex];
-  // activity
-  if(step.activity){
-    state.activity.push({
-      time: now(state.stepIndex*3),
-      actor: step.activity.actor,
-      label: step.activity.label,
-      text: step.activity.text
-    });
-  }
-  // unlock record
-  if(step.unlockRecord){
-    state.records[step.unlockRecord] = {
-      status: RECORD_DEFS[step.unlockRecord].status,
-      statusLabel: RECORD_DEFS[step.unlockRecord].statusLabel
-    };
-  }
-  // advance record statuses
-  if(step.advanceRecordStatus){
-    step.advanceRecordStatus.forEach(upd=>{
-      if(state.records[upd.id]){
-        state.records[upd.id].status = upd.status;
-        state.records[upd.id].statusLabel = upd.statusLabel;
-      }
-    });
-  }
-  updateConsole();
-}
+    <div class="agents-grid">
+      <div class="agent-card">
+        <div class="agent-num">A1 · Dealer side</div>
+        <div class="agent-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <div class="agent-name">Reorder Sentinel</div>
+        <div class="agent-role">Stock watcher</div>
+        <div class="agent-desc">Monitors dealer inventory against reorder thresholds. Drafts a parts request with line items the spares manager can submit with one tap.</div>
+      </div>
 
-function rewindStep(){
-  if(state.stepIndex === 0) return;
-  // simplest: restart and replay to desired index
-  const target = state.stepIndex - 1;
-  state.stepIndex = 0;
-  state.activity = [];
-  state.records = {};
-  while(state.stepIndex < target){
-    advanceStep();
-  }
-  updateConsole();
-}
+      <div class="agent-card">
+        <div class="agent-num">A2 · OEM intake</div>
+        <div class="agent-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/></svg>
+        </div>
+        <div class="agent-name">Request Processor</div>
+        <div class="agent-role">Triage &amp; route</div>
+        <div class="agent-desc">Validates the dealer and SKUs, prices from the active price list, checks inventory, and decides whether to fulfill from stock or engage procurement.</div>
+      </div>
 
-/* ==================== EVENT WIRING ==================== */
-document.getElementById('nextBtn').addEventListener('click', advanceStep);
-document.getElementById('prevBtn').addEventListener('click', rewindStep);
-document.getElementById('backToChat').addEventListener('click', transitionToChat);
+      <div class="agent-card">
+        <div class="agent-num">A3 · Sourcing</div>
+        <div class="agent-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <div class="agent-name">Procurement Agent</div>
+        <div class="agent-role">Supplier sourcing</div>
+        <div class="agent-desc">When stock is short, matches the active supplier contract, decides between OEM-warehouse route and drop-ship, and issues the PO with contract pricing.</div>
+      </div>
 
-document.getElementById('scenarioSelect').addEventListener('change', (e)=>{
-  state.scenario = e.target.value;
-  state.stepIndex = 0;
-  state.activity = [];
-  state.records = {};
-  if(document.getElementById('page-console').classList.contains('active')){
-    updateConsole();
-  } else {
-    renderChat();
-  }
-});
+      <div class="agent-card">
+        <div class="agent-num">A4 · Dealer billing</div>
+        <div class="agent-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="agent-name">Invoice + AR Agent</div>
+        <div class="agent-role">Receivables posting</div>
+        <div class="agent-desc">On shipment confirmation, generates the GST-compliant dealer invoice using the price list, and posts it to Accounts Receivable in OEM Financials.</div>
+      </div>
 
-document.querySelectorAll('.side-tab').forEach(t=>{
-  t.addEventListener('click', ()=>{
-    document.querySelectorAll('.side-tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.side-panel').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('sp-'+t.dataset.sidetab).classList.add('active');
-  });
-});
+      <div class="agent-card">
+        <div class="agent-num">A5 · Supplier payment</div>
+        <div class="agent-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="agent-name">AP Reconciliation</div>
+        <div class="agent-role">3-way match</div>
+        <div class="agent-desc">Receives the supplier invoice, performs a 3-way match against PO and GRN (or dealer POD for drop-ship), and posts it to Accounts Payable.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-/* ==================== INIT ==================== */
-renderChat();
+<!-- ============ SCENARIOS ============ -->
+<section id="scenarios" class="scenarios-section">
+  <div class="container">
+    <div class="section-eyebrow">Scenarios Demonstrated</div>
+    <h2 class="section-title">Three fulfillment paths, all covered.</h2>
+    <p class="section-lead">
+      The walkthrough lets you step through each scenario at your own pace. System-of-record documents unlock as they are created in the flow — click any to open a full ERP-style record view.
+    </p>
 
-</script>
+    <div class="scenarios-grid">
+      <a href="axle-oem-parts-walkthrough.html" class="scenario-card">
+        <div class="scenario-num">
+          <span>SCENARIO 01</span>
+          <span class="chip simple">Simplest path</span>
+        </div>
+        <h3 class="scenario-title">In-stock · OEM warehouse fulfills</h3>
+        <p class="scenario-desc">
+          All requested SKUs are available at the nearest OEM warehouse. Request is priced, a shipment line is created, warehouse picks and ships, dealer receives, AR invoice posts.
+        </p>
+        <div class="scenario-meta">
+          <div class="sm-row"><span class="sm-k">Agents used</span><span class="sm-v">3 of 5</span></div>
+          <div class="sm-row"><span class="sm-k">Walkthrough steps</span><span class="sm-v">8</span></div>
+          <div class="sm-row"><span class="sm-k">Records created</span><span class="sm-v">4</span></div>
+          <div class="sm-row"><span class="sm-k">Finance legs</span><span class="sm-v">AR only</span></div>
+        </div>
+        <div class="scenario-link">
+          View walkthrough
+          <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </a>
+
+      <a href="axle-oem-parts-walkthrough.html" class="scenario-card">
+        <div class="scenario-num">
+          <span>SCENARIO 02</span>
+          <span class="chip standard">Full cycle</span>
+        </div>
+        <h3 class="scenario-title">Out-of-stock · PO routed to OEM warehouse</h3>
+        <p class="scenario-desc">
+          Stock is short. Procurement agent issues a PO to the supplier, goods arrive at the OEM warehouse and are consolidated with on-hand stock. Dealer gets one unified shipment; both AR and AP post.
+        </p>
+        <div class="scenario-meta">
+          <div class="sm-row"><span class="sm-k">Agents used</span><span class="sm-v">5 of 5</span></div>
+          <div class="sm-row"><span class="sm-k">Walkthrough steps</span><span class="sm-v">11</span></div>
+          <div class="sm-row"><span class="sm-k">Records created</span><span class="sm-v">5</span></div>
+          <div class="sm-row"><span class="sm-k">Finance legs</span><span class="sm-v">AR + AP</span></div>
+        </div>
+        <div class="scenario-link">
+          View walkthrough
+          <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </a>
+
+      <a href="axle-oem-parts-walkthrough.html" class="scenario-card">
+        <div class="scenario-num">
+          <span>SCENARIO 03</span>
+          <span class="chip fast">Fastest path</span>
+        </div>
+        <h3 class="scenario-title">Out-of-stock · drop-ship to dealer</h3>
+        <p class="scenario-desc">
+          Stock is short but the supplier is closer to the dealer. Procurement agent activates the drop-ship clause — supplier ships directly to dealer. AP uses dealer POD (in place of OEM GRN) for 3-way match.
+        </p>
+        <div class="scenario-meta">
+          <div class="sm-row"><span class="sm-k">Agents used</span><span class="sm-v">5 of 5</span></div>
+          <div class="sm-row"><span class="sm-k">Walkthrough steps</span><span class="sm-v">10</span></div>
+          <div class="sm-row"><span class="sm-k">Records created</span><span class="sm-v">5</span></div>
+          <div class="sm-row"><span class="sm-k">Freight legs saved</span><span class="sm-v">1</span></div>
+        </div>
+        <div class="scenario-link">
+          View walkthrough
+          <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPABILITIES ============ -->
+<section>
+  <div class="container">
+    <div class="section-eyebrow">What the demo shows</div>
+    <h2 class="section-title">Built to answer the hard questions your stakeholders will ask.</h2>
+    <p class="section-lead">
+      Every click maps to a real system-of-record interaction. This is not a slideware flow — it is a working interaction model for how the feature should behave in production.
+    </p>
+
+    <div class="cap-grid">
+      <div class="cap-item">
+        <h4><span class="num">01</span> Two pricing sources, clearly separated</h4>
+        <p>Dealer invoices are always priced from the <b>dealer price list</b>. Supplier POs are always priced from the <b>supplier contract</b>. The demo makes this visible in every scenario so pricing governance stays clean.</p>
+      </div>
+      <div class="cap-item">
+        <h4><span class="num">02</span> System-of-record transparency</h4>
+        <p>Every record the flow creates — Parts Request, Shipment Line, PO, Shipment, AR invoice, AP invoice — is clickable, opens an <b>ERP-style record page</b>, and shows the posting, audit trail, and line detail.</p>
+      </div>
+      <div class="cap-item">
+        <h4><span class="num">03</span> Automated 3-way match</h4>
+        <p>The AP agent reconciles the supplier invoice against the PO and the receipt (GRN or dealer POD). Matches post straight to AP with <b>no human approval</b> in the happy path.</p>
+      </div>
+      <div class="cap-item">
+        <h4><span class="num">04</span> Flexible fulfillment routing</h4>
+        <p>Procurement chooses between <b>OEM warehouse routing</b> (for consolidation) and <b>direct drop-ship</b> (for speed) based on contract clauses, dealer urgency, and geographic fit — modeled transparently.</p>
+      </div>
+      <div class="cap-item">
+        <h4><span class="num">05</span> Activity log &amp; audit</h4>
+        <p>Every agent and system action is timestamped in an activity pane. The <b>audit trail</b> on each record makes it clear which agent did what and when — essential for finance sign-off.</p>
+      </div>
+      <div class="cap-item">
+        <h4><span class="num">06</span> Minimal human loop</h4>
+        <p>Only two human touchpoints: the dealer tapping <b>Order parts</b> to consent to spend, and the <b>proof-of-delivery</b> confirmation on receipt. Everything else runs between agents.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE STRIP ============ -->
+<section id="architecture" class="arch">
+  <div class="container">
+    <div class="arch-title">Systems &amp; Actors Visible in the Demo</div>
+    <div class="arch-systems">
+      <div class="arch-sys hu"><span class="dot"></span>Dealer (spares manager)</div>
+      <span class="arch-sep">→</span>
+      <div class="arch-sys ag"><span class="dot"></span>5 AI agents</div>
+      <span class="arch-sep">→</span>
+      <div class="arch-sys sys"><span class="dot"></span>Price List</div>
+      <div class="arch-sys sys"><span class="dot"></span>Inventory (WMS)</div>
+      <div class="arch-sys sys"><span class="dot"></span>Supplier Contract</div>
+      <div class="arch-sys sys"><span class="dot"></span>Warehouse Ops</div>
+      <div class="arch-sys sys"><span class="dot"></span>Shipment &amp; POD</div>
+      <div class="arch-sys sys"><span class="dot"></span>OEM Financials (AR · AP)</div>
+      <span class="arch-sep">→</span>
+      <div class="arch-sys hu"><span class="dot"></span>Supplier</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA FOOTER ============ -->
+<section class="cta-section">
+  <div class="cta-eyebrow">Ready to explore</div>
+  <h2 class="cta-title">Walk through the flow — <em>one decision at a time</em>.</h2>
+  <p class="cta-lead">
+    The interactive walkthrough lets you pause on any step, inspect the record that was just created, switch scenarios, and see how the same five agents handle every path.
+  </p>
+  <div class="cta-ctas">
+    <a href="axle-oem-parts-walkthrough.html" class="cta-primary">
+      Launch the walkthrough
+      <svg viewBox="0 0 12 12" fill="none"><path d="M5 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#overview" class="cta-ghost">Back to top</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div>
+    <b>Axle</b> · Agentic Automotive Platform · Proof of concept
+  </div>
+  <div>
+    Prepared for client review · Release candidate · April 2026
+  </div>
+</footer>
+
 </body>
 </html>
